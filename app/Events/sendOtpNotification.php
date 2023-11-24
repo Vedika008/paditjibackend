@@ -21,8 +21,9 @@ class sendOtpNotification extends Event
 
 
 
-    public function __construct($panditjii,$otp, $mobile_number)
-    {   $this->panditjii = $panditjii;
+    public function __construct($otp, $mobile_number, $panditjii = null)
+    {
+        $this->panditjii = $panditjii;
         $this->otp = $otp;
         $this->mobile_number = $mobile_number;
     }

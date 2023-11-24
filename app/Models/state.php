@@ -25,4 +25,8 @@ class state extends Model
         }
         return false;
     }
+
+    public function cities() {
+        return $this->hasMany(City::class);
+    }
 }

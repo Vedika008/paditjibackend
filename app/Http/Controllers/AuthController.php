@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use Cache;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Carbon;
+
+
 
 
 
@@ -35,55 +38,45 @@ class AuthController extends Controller
         return response()->json(['access_token' => $accessToken]);
     }
 
-    public function login(Request $request)
+    public function LoginVerify(Request $request)
     {
         $input = $request->all();
-            $mobileNumber = $request->input('mobile_number');
-            $enteredOTP = $request->input('otp');
+        $mobileNumber = $request->input('mobileNumber');
+        $enteredOTP = $request->input('otp');
 
-            $cachedOtp = Cache::get('otp' . $mobileNumber);
+        $cachedOtp = Cache::get('otp' . $mobileNumber);
+        // dd($cachedOtp);
+        if ($cachedOtp ==  $enteredOTP) {
+            // Check if user exists in the database
+            $panditji = PanditjiRegistration::where('mobile_number', $mobileNumber)->first();
+            Cache::forget('otp' . $input['mobileNumber']);
+            if ($panditji) {
+                $token = JWTAuth::fromUser($panditji,[
+                    'exp' => Carbon ::now()->addHours(1)->timestamp ]
+                );
 
-            if ($cachedOtp ==  $enteredOTP) {
-                // Check if user exists in the database
-                $panditji = PanditjiRegistration :: where('mobile_number' ,$mobileNumber)->first();
+                $panditji->community = json_decode($panditji->community);
+                $panditji->other_community = json_decode($panditji->other_community);
+                $panditji->language = json_decode($panditji->language);
+                $panditji->other_language = json_decode($panditji->other_language);
+                $panditji->poojasPerformed = json_decode($panditji->poojasPerformed);
+                $panditji->otherPooja = json_decode($panditji->otherPooja);
 
-                if ($panditji) {
-                    $token = JWTAuth::fromUser($panditji);
-
-                    // Respond with the token and other details upon successful authentication
-                    return response()->json([
-                        'user' => $panditji,
-                        'access_token' => $token,
-                        'message' => 'Login successful',
-                    ]);
-
-
-
-                    // $token = JWTAuth::attempt($request->only('mobile_number', 'otp'));
-
-                    // dd($token);
-                    // if (!$token) {
-                    //     return response()->json(['error' => 'Unauthorized'], 401);
-                    // }else{
-                    //     return response()->json([
-                    //         'panditji' => $panditji,
-                    //         'access_token' => $token,
-                    //         'message' => 'Login successful',
-                    //     ]);
-                    // }
-
-
-
-                } else {
-                   return response() ->json(['status' => true , 'message'=>'invalid credentials'],400);
-                }
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Login successful',
+                    'details' => $panditji,
+                    'access_token' => $token,
+                ]);
             } else {
-                return response()->json(['status' =>false, 'message' => 'OTP verification failed'], 401);
+                return response()->json(['status' => true, 'message' => 'Invalid Credentials'], 400);
             }
-
+        } else {
+            return response()->json(['status' => false, 'message' => 'OTP verification failed'], 401);
+        }
     }
 
-    public function otpGenerate($mobilenumber)
+    public function otpGenerateForLogin($mobilenumber)
     {
         try {
             $otp = random_int(100000, 999999);
@@ -91,22 +84,49 @@ class AuthController extends Controller
             $panditjii = PanditjiRegistration::where('mobile_number', $mobilenumber)->first();
 
             if ($panditjii) {
-                event(new sendOtpNotification($panditjii, $otp, $mobilenumber));
+                event(new sendOtpNotification($otp, $mobilenumber, $panditjii,));
                 $msg = "Dear User Your OTP for Docexa is " . $otp;
                 $data = $this->sendSms($mobilenumber, $msg);
                 if ($data) {
                     Cache::put('otp' . $mobilenumber, $otp, $this->generateTimestamp()->addMinutes(2));
-                    return response()->json(['status' => true, 'message' => 'Otp sent successfully'], 200);
+                    // $temp = Cache::get('otp' . $mobilenumber);
+                    // dd($temp);
+                    return response()->json(['status' => true, 'message' => 'OTP Sent Successfully', 'otp' => $otp], 200);
                 } else {
-                    return response()->json(['status' => false, 'message' => 'Internal server error'], 400);
+                    return response()->json(['status' => false, 'message' => 'Internal Server Error'], 400);
                 }
-
             } else {
-                return response()->json(['status' => false, 'message' => 'Panditji does not exist'], 400);
-
+                return response()->json(['status' => false, 'message' => 'Mobile Number Not Exist'], 400);
             }
         } catch (\Throwable $th) {
             dd($th);
+            return response()->json(['status' => false, 'message' => 'Internal server error'], 500);
+        }
+    }
+
+    // for register
+    public function otpforRegister($mobilenumber)
+    {
+        try {
+            $otp = random_int(100000, 999999);
+            // find the panditji whetre uu want to send sms
+            $panditjii = PanditjiRegistration::where('mobile_number', $mobilenumber)->first();
+
+            if ($panditjii) {
+                return response()->json(['status' => false, 'message' => 'Mobile number already exist'], 200);
+            } else {
+                // event(new sendOtpNotification($otp, $mobilenumber));
+                $msg = "Dear User Your OTP for Docexa is " . $otp;
+                $data = $this->sendSms($mobilenumber, $msg);
+                if ($data) {
+                    Cache::put('otp' . $mobilenumber, $otp, $this->generateTimestamp()->addMinutes(2));
+                    return response()->json(['status' => true, 'message' => 'Otp sent successfully', 'otp' => $otp], 200);
+                } else {
+                    return response()->json(['status' => false, 'message' => 'Internal server error'], 400);
+                }
+            }
+        } catch (\Throwable $th) {
+            // dd($th);
             return response()->json(['status' => false, 'message' => 'Internal server error'], 500);
         }
     }
@@ -115,14 +135,14 @@ class AuthController extends Controller
         try {
             $input = $request->all();
             $cachedOtp = Cache::get('otp' . $input['mobileNumber']);
-            var_dump(Cache::get('otp' . $input['mobileNumber']));
-            var_dump($input['otp']);
-            var_dump($cachedOtp == $input['otp']);
+            // var_dump(Cache::get('otp' . $input['mobileNumber']));
+            // var_dump($input['otp']);
+            // var_dump($cachedOtp == $input['otp']);
             if ($cachedOtp == $input['otp']) {
                 Cache::forget('otp' . $input['mobileNumber']);
-                return response()->json(['status' => true, 'message' => 'OTP verified'], 200);
+                return response()->json(['status' => true, 'message' => 'OTP is Verified'], 200);
             } else {
-                return response()->json(['status' => false, 'message' => 'Otp is incorrect'], 200);
+                return response()->json(['status' => false, 'message' => 'Otp is Incorrect'], 401);
             }
         } catch (\Throwable $th) {
             dd($th);
@@ -172,16 +192,15 @@ class AuthController extends Controller
 
             if ($cachedOtp == $enteredOTP) {
                 Cache::forget('otp' . $mobileNumber);
-               return true;
+                return true;
             } else {
-               return false;
+                return false;
             }
         } catch (\Throwable $th) {
             dd($th);
             return response()->json(['status' => false, 'message' => 'Internal server error'], 500);
         }
     }
-
 }
 
 
@@ -214,4 +233,3 @@ class AuthController extends Controller
 // } catch (\Throwable $th) {
 //     return response()->json(['status' => false, 'message' => 'Internal server error'], 500);
 // }
-

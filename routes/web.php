@@ -1,4 +1,5 @@
 <?php
+
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\PatientController;
 
@@ -25,6 +26,8 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
     $router->post('/panditji/register', 'PantitjiController@PanditjiRegistration');
     $router->get('/panditji/getPandithiRegistrationDetails/{mobileNo}', 'PantitjiController@getPanditRegistrationDetails');
 
+    $router->get('/panditji/utility', 'PantitjiController@getUtilityDetails');
+
     $router->get('/pandiji/poojasPerformed', 'PantitjiController@getPoojasPerformedList');
 
     $router->get('/pandiji/community', 'PantitjiController@getCommunityList');
@@ -37,29 +40,25 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
     $router->post('/panditji/generateOtp/{mobilenumber}', 'PantitjiController@generateOTP');
 
     // create yajman
-    $router->post('/panditji/{panditjiId}/create/yajman', 'PantitjiController@yajmanCreation');
-    $router->get('/panditji/{panditjiId}/getYajmanDetails/{yajmanId}', 'PantitjiController@getYajmanDetails');
+    // $router->post('/panditji/{panditjiId}/create/yajman', 'PantitjiController@yajmanCreation');
+
 
     //create pooja appointemnt
     $router->post('/panditji/{panditjiId}/createAppoinment/{yajmanId}', 'PantitjiController@createAppointment');
     $router->get('/panditji/{panditjiId}/getAppointmentDetails', 'PantitjiController@getAppointmentDetails');
 
-    // Login api using mobile numebewr
-    $router->post('/panditji/login', 'AuthController@Login');
-
-    // $router->post('generate/accesstoken', 'AuthController@generateAccesstoken');
-
-    $router->get('/generateOtp/{mobilenumber}', 'AuthController@otpGenerate');
+    // register
+    $router->get('/register/checkAndGenerateOtp/{mobilenumber}', 'AuthController@otpforRegister');
     $router->post('/verifyOtp', 'AuthController@otpVerify');
-    $router->post('/send-otp', 'AuthController@sendOtp');
 
+    // login
+    $router->get('/login/checkAndGenerateOtp/{mobilenumber}', 'AuthController@otpGenerateForLogin');
+    $router->post('/login/verify', 'AuthController@LoginVerify');
+});
 
-
-
-
-
-
-
-
-
+$router->group(['prefix' => 'api/v1/pandit/', 'middleware' => 'auth'], function () use ($router) {   
+    /* yajaman apis  */
+    $router->post('yajman/create', 'PantitjiController@yajmanCreation');
+    $router->get('getYajmans','PantitjiController@getYajmanDetails');
+    $router->get('getYajman/{id}', 'PantitjiController@getYajmanDetailsByYajmanId');
 });

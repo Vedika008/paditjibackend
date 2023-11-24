@@ -27,4 +27,23 @@ class city extends Model
         }
         return false;
     }
+
+    public function state()
+    {
+        return $this->belongsTo(State::class);
+    }
+
+    public function getStateWithCity($stateId, $cityId)
+    {
+        try {
+            $city = city::where('city_id', $cityId)->first();
+            $state = null;
+            if ($city) {
+                $state = state::where('state_id', $stateId)->first();
+            }
+            return ['state' => $state->state_name, 'city' => $city->city_name];
+        } catch (\Throwable $th) {
+            return false;
+        }
+    }
 }

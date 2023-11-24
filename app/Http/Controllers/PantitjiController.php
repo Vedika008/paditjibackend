@@ -5,17 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\appointmentDetails;
 use App\Models\city;
 use App\Models\Community;
+use App\Models\experience;
 use App\Models\language;
 use App\Models\PanditjiRegistration;
-use App\Models\panditjiYajmanRelation;
 use App\Models\PoojasThatPerformed;
 use App\Models\state;
+use App\Models\working_hr;
 use App\Models\yajman;
-use App\Notifications\InvoicePaid;
-use App\Notifications\SmsNotification;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
-use Illuminate\Notifications\Notification;
+use Tymon\JWTAuth\Facades\JWTAuth;
+
 use DB;
 
 class PantitjiController extends Controller
@@ -24,33 +23,64 @@ class PantitjiController extends Controller
     {
         try {
             $input = $request->all();
+            $inputData = $input;
+
+            $personalInfo = $inputData['personal_info'];
+            $auth = $inputData['auth'];
+            $communityAndLanguage = $inputData['community_and_language'];
+            $otherInfo = $inputData['other_info'];
+
             $pr = new PanditjiRegistration();
-            $panditExist = $pr->getPandithjiDetails($input['mobile_number']);
+            $panditExist = $pr->getPandithjiDetails($auth['mobile_number']);
             if ($panditExist == false) {
-                $pr->title = $input['title'];
-                $pr->first_name = $input['first_name'];
-                $pr->last_name = $input['last_name'];
-                $pr->address = $input['address'];
-                $pr->state = $input['state'];
-                $pr->district = $input['district'];
-                $pr->mobile_number = $input['mobile_number'];
-                $pr->community = $input['community'];
-                $pr->language = $input['language'];
-                $pr->working_hr = $input['working_hr'];
-                $pr->experience = $input['experience'];
-                $pr->poojasPerformed = $input['poojasPerformed'];
-                $pr->working_in_temple = $input['working_in_temple'];
+                $pr->title = $personalInfo['title'];
+                $pr->other_title = $personalInfo['other_title'];
+                $pr->first_name = $personalInfo['first_name'];
+                $pr->last_name = $personalInfo['last_name'];
+                $pr->address = $personalInfo['address'];
+                $pr->state = $personalInfo['state'];
+                $pr->district = $personalInfo['district'];
+
+                $pr->mobile_number = $auth['mobile_number'];
+
+                $pr->community = json_encode($communityAndLanguage['community']);
+                $pr->other_community = json_encode($communityAndLanguage['othercommunity']);
+                $pr->language = json_encode($communityAndLanguage['languages']);
+                $pr->other_language = json_encode($communityAndLanguage['otherlanguages']);
+
+                $pr->working_hr = $otherInfo['working_time'];
+                $pr->experience = $otherInfo['experience'];
+                $pr->otherPooja = json_encode($otherInfo['other_pooja']);
+                $pr->poojasPerformed = json_encode($otherInfo['poojas_can']);
+                $pr->working_in_temple = $otherInfo['working_in_temple'];
+                // $string=implode(' ',$pr);
+                // dd($string);
                 $save = $pr->save();
+
+
+                // $pr->title = $input['title'];
+                // $pr->first_name = $input['first_name'];
+                // $pr->last_name = $input['last_name'];
+                // $pr->address = $input['address'];
+                // $pr->state = $input['state'];
+                // $pr->district = $input['district'];
+                // $pr->mobile_number = $input['mobile_number'];
+                // $pr->community = $input['community'];
+                // $pr->language = $input['language'];
+                // $pr->working_hr = $input['working_hr'];
+                // $pr->experience = $input['experience'];
+                // $pr->poojasPerformed = $input['poojasPerformed'];
+                // $pr->working_in_temple = $input['working_in_temple'];
+                // $save = $pr->save();
 
                 if ($save) {
                     return response()->json(['status' => true, 'message' => "Pandit registered successfully"], 200);
                 } else {
-                    return response()->json(['status' => false, 'error' => 'Something went wrong', 'message' => "Panditji Registration Failed"], 500);
+                    return response()->json(['status' => false, 'error' => 'Something went wrong', 'message' => "Panditji Registration Failed"], 200);
                 }
             } else {
-                return response()->json(["status" => false, "message" => "Panditji is already exist"], 400);
+                return response()->json(["status" => false, "message" => "Panditji is already exist"], 200);
             }
-
         } catch (\Throwable $th) {
             dd($th);
             return response()->json(['status' => false, 'message' => 'Internal Server Error'], 500);
@@ -60,18 +90,80 @@ class PantitjiController extends Controller
     {
         try {
             $panditji = new PanditjiRegistration();
-            $panditjiExist = $panditji->getPandithjiDetails($mobileNo);
+            $data = $panditji->getPandithjiDetails($mobileNo);
+            // dd($data);
 
-            if ($panditjiExist == false) {
+
+            $structuredData = [
+                "personal_info" => [
+                    "title" => $data["title"],
+                    "other_title" => $data["other_title"],
+                    "first_name" => $data["first_name"],
+                    "last_name" => $data["last_name"],
+                    "state" => $data["state"],
+                    "district" => $data["district"],
+                    "address" => $data["address"]
+                ],
+                "auth" => [
+                    "mobile_number" => $data["mobile_number"]
+                ],
+                "community_and_language" => [
+                    "community" => [$data["community"]],
+                    "othercommunity" => $data["other_community"],
+                    "languages" => [$data["language"]],
+                    "otherlanguages" => $data["other_language"]
+                ],
+                "other_info" => [
+                    "working_time" => (int) $data["working_hr"],
+                    "experience" => (int) $data["experience"],
+                    "poojas_can" => [$data["poojasPerformed"]],
+                    "other_pooja" => $data["otherPooja"],
+                    "working_in_temple" => (bool) $data["working_in_temple"]
+                ]
+            ];
+
+
+            if ($data == false) {
                 return response()->json(['status' => false, 'message' => 'Panditji does not exist'], 400);
             } else {
-                return response()->json(['status' => true, 'message' => 'Panditji data successfully retrived', 'data' => $panditjiExist], 200);
+                return response()->json(['status' => true, 'message' => 'Panditji data successfully retrived', 'data' => $structuredData], 200);
             }
         } catch (\Throwable $th) {
-            dd($th);
             return response()->json(['status' => false, 'message' => 'Internal server error'], 500);
         }
+    }
 
+    public function getUtilityDetails()
+    {
+
+
+        try {
+            $panditjiPooja = new PoojasThatPerformed();
+            $PoojaList = $panditjiPooja->getPoojalist();
+            // dd($PoojaList);
+
+            $panditjiCommunity = new Community();
+            $CommunityList = $panditjiCommunity->getCommunityList();
+
+            $panditjiLanguage = new language();
+            $languageList = $panditjiLanguage->getLanguageList();
+
+            $panditjiState = new state();
+            $stateList = $panditjiState->getStateList();
+
+            $panditjiWorkingHr = new working_hr();
+            $workingHrList = $panditjiWorkingHr->getworkingHrList();
+
+            $panditjiExperience = new experience();
+            $experienceList = $panditjiExperience->getExperienceList();
+
+            if ($PoojaList) {
+                return response()->json(['status' => true, 'message' => 'Data retrived successfully', 'data' => ['pooja' => $PoojaList, 'community' => $CommunityList, 'language' => $languageList, 'state' => $stateList, 'workingHrList' => $workingHrList, 'experienceList' => $experienceList]], 200);
+            }
+            return response()->json(['status' => false, 'message' => 'something went wrong'], 500);
+        } catch (\Throwable $th) {
+            return response()->json(['status' => false, 'message' => 'Internal server error'], 500);
+        }
     }
 
     public function getPoojasPerformedList()
@@ -155,28 +247,28 @@ class PantitjiController extends Controller
     public function generateOTP($mobile_number, Request $request)
     {
         try {
-
         } catch (\Throwable $th) {
-
         }
     }
 
-    public function yajmanCreation($panditjiId, Request $request)
+    public function yajmanCreation(Request $request)
     {
-        // cheack if panditji exit then only yajman can create
-        $panditji = new PanditjiRegistration();
-        $panditjiExist = $panditji->checkPanditjiExistByItsId($panditjiId);
-        $input = $request->all();
         try {
+            $panditjiId = $request->id;
+            // cheack if panditji exit then only yajman can create
+            $panditji = new PanditjiRegistration();
+            $panditjiExist = $panditji->checkPanditjiExistByItsId($panditjiId);
+            $input = $request->all();
             if ($panditjiExist == false) {
-                return response()->json(['status' => false, 'message' => 'Panditji does not exist'], 400);
+                return response()->json(['status' => false, 'message' => 'Mobile Number not exist'], 400);
             } else {
                 $yajman = new yajman();
-                $yajmanExist = $yajman->cheackYajmanExist($input['mobile_number']);
+                $yajmanExist = $yajman->cheackYajmanExist($panditjiId, $input['mobile_number']);
+
 
                 // dd($yajmanExist);
                 if ($yajmanExist) {
-                    return response()->json(['status' => false, 'message' => 'Yajman is already exist'], 400);
+                    return response()->json(['status' => false, 'message' => 'Mobile Number Already exist'], 400);
                 } else {
                     $yajman->yajman_name = $input['yajman_name'];
                     $yajman->mobile_number = $input['mobile_number'];
@@ -186,45 +278,61 @@ class PantitjiController extends Controller
                     $yajman->date_of_birth = $input['date_of_birth'];
                     $yajman->created_by = $panditjiId;
 
+                    // dd($yajman);
                     $save = $yajman->save();
-                    // dd($save);
+
+
 
                     if ($save) {
                         // id, pantiji_id, yajman_id, created_at, updated_at, created_by
                         $currentTimestamp = $this->generateTimestamp();
+                        $yajmansUnderPanditji = $yajman->getYajmanUnderThePanditji($panditjiId);
+                        // dd($yajmansUnderPanditji);
+
+                        // $yajmansUnderPanditji = yajman::where('created_by', $panditjiId)->get()->all;
 
                         DB::insert('insert into panditji_yajman_relation (pantiji_id, yajman_id, created_at,created_by) values(?,?,?,?)', [$panditjiId, $yajman->id, $currentTimestamp, $panditjiId]);
 
-                        return response()->json(['status' => true, 'message' => 'Yajman registrated successfully'], 200);
+                        return response()->json(['status' => true, 'message' => 'Yajman register successfully', 'data' => $yajmansUnderPanditji], 200);
                     } else {
                         return response()->json(['status' => false, 'error' => 'Something went wrong', 'message' => "Patient Registration Failed"], 500);
                     }
                 }
             }
         } catch (\Throwable $th) {
-            dd($th);
-            return response()->json(['status' => false, 'message' => 'Internal Server Error'], 500);
+            // dd($th);
+            return response()->json(['status' => false, 'message' => 'Internal Server Error', 'e' => $th], 500);
         }
     }
 
-    public function getYajmanDetails($panditjiId, $yajmanId)
+    public function getYajmanDetails(Request $request)
+    {
+        /* all yajmans under pandit*/
+        try {
+            $panditjiId = $request->id;
+            $yajman = new yajman();
+            $yajmanDetails = $yajman->getYajmanUnderThePanditji($panditjiId);
+            if ($yajmanDetails) {
+                return response()->json(['status' => true, 'data' => $yajmanDetails], 200);
+            }
+            return response()->json(['status' => false, 'message' => 'Yajmans does not exist'], 400);
+        } catch (\Throwable $th) {
+            return response()->json(['status' => false, 'message' => 'Internal server error', 'error' => $th], 500);
+        }
+    }
+    public function getYajmanDetailsByYajmanId(Request $request, $id)
     {
         try {
-
+            $panditjiId = $request->id;
             $yajman = new yajman();
-            $yajman->state = $panditjiId;
-
-            $yajmanDetails = $yajman->getYajmanDetails($yajmanId);
-
-            if ($yajmanDetails == false) {
-                return response()->json(['status' => false, 'message' => 'Yajman does not exist'], 400);
-            } else {
-                return response()->json(['status' => true, 'message' => 'Yajman details retrived successfully', 'data' => $yajmanDetails], 200);
-
+            $yajmanDetails = $yajman->getYajmanDetails($id);
+            // dd($yajmanDetails);
+            if ($yajmanDetails) {
+                return response()->json(['status' => true, 'message' => 'Yajman details retrived successfully', 'data' => $yajmanDetails[0]], 200);
             }
+            return response()->json(['status' => false, 'message' => 'Yajmans does not exist'], 200);
         } catch (\Throwable $th) {
-            dd($th);
-            return response()->json(['status' => false, 'message' => 'Internal server error'], 500);
+            return response()->json(['status' => false, 'message' => 'Internal server error', 'error' => $th], 500);
         }
     }
 
@@ -276,7 +384,6 @@ class PantitjiController extends Controller
                 return response()->json(['status' => false, 'message' => 'No more appointments under this panditji'], 400);
             } else {
                 return response()->json(['status' => true, 'message' => 'Appointment details retrived successfully', 'data' => $appointmentDetails], 200);
-
             }
         } catch (\Throwable $th) {
             dd($th);
@@ -284,4 +391,18 @@ class PantitjiController extends Controller
         }
     }
 
+    public function listOfYajmanUnderThePanditji(Request $request)
+    {
+        try {
+            $panditjiId = $request->id;
+            $yajman = new yajman();
+            $yajmansUnderPanditji = $yajman->getYajmanUnderThePanditji($panditjiId);
+            if ($yajmansUnderPanditji) {
+                return response()->json(['status' => true, 'message' => 'Yajmans details retrived successfully', 'data' => $yajmansUnderPanditji], 200);
+            }
+            return response()->json(['status' => false, 'message' => 'No more yajmans under the panditji'], 400);
+        } catch (\Throwable $th) {
+            return response()->json(['status' => false, 'message' => 'Internal server error'], 500);
+        }
+    }
 }

@@ -20,6 +20,7 @@ class PanditjiRegistration extends Model implements JWTSubject
     protected $fillable = [
         'id',
         'title',
+        'other_title',
         'first_name',
         'last_name',
         'address',
