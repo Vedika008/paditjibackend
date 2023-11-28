@@ -56,9 +56,19 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
     $router->post('/login/verify', 'AuthController@LoginVerify');
 });
 
-$router->group(['prefix' => 'api/v1/pandit/', 'middleware' => 'auth'], function () use ($router) {   
+$router->group(['prefix' => 'api/v1/pandit/', 'middleware' => 'auth'], function () use ($router) {
     /* yajaman apis  */
-    $router->post('yajman/create', 'PantitjiController@yajmanCreation');
-    $router->get('getYajmans','PantitjiController@getYajmanDetails');
-    $router->get('getYajman/{id}', 'PantitjiController@getYajmanDetailsByYajmanId');
+    $router->post('yajman/create', 'yajmanController@yajmanCreation');
+    $router->get('getYajmans', 'yajmanController@getYajmanDetails');
+    $router->get('getYajman/{id}', 'yajmanController@getYajmanDetailsByYajmanId');
+});
+
+$router->group(['prefix' => 'api/v1/pandit/poojaMaterial/', 'middleware' => 'auth'], function () use ($router) {
+    $router->post('create', 'PujaController@addPuja');
+
+    $router->get('view', 'PujaController@getAllPujaThatCreated');
+    // $router->put('update/{id}', 'PujaController@addPuja');
+    // $router->delete('dalete/{id}', 'PujaController@addPuja');
+
+    $router->get('getPujaMaterial','PujaController@getAllPoojaMaterials');
 });

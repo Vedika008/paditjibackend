@@ -19,6 +19,7 @@ use DB;
 
 class PantitjiController extends Controller
 {
+// panditji registration
     public function PanditjiRegistration(Request $request)
     {
         try {
@@ -55,23 +56,8 @@ class PantitjiController extends Controller
                 $pr->working_in_temple = $otherInfo['working_in_temple'];
                 // $string=implode(' ',$pr);
                 // dd($string);
+                // dd($pr);
                 $save = $pr->save();
-
-
-                // $pr->title = $input['title'];
-                // $pr->first_name = $input['first_name'];
-                // $pr->last_name = $input['last_name'];
-                // $pr->address = $input['address'];
-                // $pr->state = $input['state'];
-                // $pr->district = $input['district'];
-                // $pr->mobile_number = $input['mobile_number'];
-                // $pr->community = $input['community'];
-                // $pr->language = $input['language'];
-                // $pr->working_hr = $input['working_hr'];
-                // $pr->experience = $input['experience'];
-                // $pr->poojasPerformed = $input['poojasPerformed'];
-                // $pr->working_in_temple = $input['working_in_temple'];
-                // $save = $pr->save();
 
                 if ($save) {
                     return response()->json(['status' => true, 'message' => "Pandit registered successfully"], 200);
@@ -86,15 +72,13 @@ class PantitjiController extends Controller
             return response()->json(['status' => false, 'message' => 'Internal Server Error'], 500);
         }
     }
+// retrive pandit registration details
     public function getPanditRegistrationDetails($mobileNo)
     {
         try {
             $panditji = new PanditjiRegistration();
             $data = $panditji->getPandithjiDetails($mobileNo);
-            // dd($data);
-
-
-            $structuredData = [
+              $structuredData = [
                 "personal_info" => [
                     "title" => $data["title"],
                     "other_title" => $data["other_title"],
@@ -133,10 +117,9 @@ class PantitjiController extends Controller
         }
     }
 
+    // community +lan+state+city apiss
     public function getUtilityDetails()
     {
-
-
         try {
             $panditjiPooja = new PoojasThatPerformed();
             $PoojaList = $panditjiPooja->getPoojalist();
@@ -166,6 +149,7 @@ class PantitjiController extends Controller
         }
     }
 
+    // extra apis
     public function getPoojasPerformedList()
     {
         try {
@@ -243,99 +227,6 @@ class PantitjiController extends Controller
             return response()->json(['status' => false, 'message' => 'Internal server error'], 500);
         }
     }
-
-    public function generateOTP($mobile_number, Request $request)
-    {
-        try {
-        } catch (\Throwable $th) {
-        }
-    }
-
-    public function yajmanCreation(Request $request)
-    {
-        try {
-            $panditjiId = $request->id;
-            // cheack if panditji exit then only yajman can create
-            $panditji = new PanditjiRegistration();
-            $panditjiExist = $panditji->checkPanditjiExistByItsId($panditjiId);
-            $input = $request->all();
-            if ($panditjiExist == false) {
-                return response()->json(['status' => false, 'message' => 'Mobile Number not exist'], 400);
-            } else {
-                $yajman = new yajman();
-                $yajmanExist = $yajman->cheackYajmanExist($panditjiId, $input['mobile_number']);
-
-
-                // dd($yajmanExist);
-                if ($yajmanExist) {
-                    return response()->json(['status' => false, 'message' => 'Mobile Number Already exist'], 400);
-                } else {
-                    $yajman->yajman_name = $input['yajman_name'];
-                    $yajman->mobile_number = $input['mobile_number'];
-                    $yajman->state = $input['state'];
-                    $yajman->city = $input['city'];
-                    $yajman->address = $input['address'];
-                    $yajman->date_of_birth = $input['date_of_birth'];
-                    $yajman->created_by = $panditjiId;
-
-                    // dd($yajman);
-                    $save = $yajman->save();
-
-
-
-                    if ($save) {
-                        // id, pantiji_id, yajman_id, created_at, updated_at, created_by
-                        $currentTimestamp = $this->generateTimestamp();
-                        $yajmansUnderPanditji = $yajman->getYajmanUnderThePanditji($panditjiId);
-                        // dd($yajmansUnderPanditji);
-
-                        // $yajmansUnderPanditji = yajman::where('created_by', $panditjiId)->get()->all;
-
-                        DB::insert('insert into panditji_yajman_relation (pantiji_id, yajman_id, created_at,created_by) values(?,?,?,?)', [$panditjiId, $yajman->id, $currentTimestamp, $panditjiId]);
-
-                        return response()->json(['status' => true, 'message' => 'Yajman register successfully', 'data' => $yajmansUnderPanditji], 200);
-                    } else {
-                        return response()->json(['status' => false, 'error' => 'Something went wrong', 'message' => "Patient Registration Failed"], 500);
-                    }
-                }
-            }
-        } catch (\Throwable $th) {
-            // dd($th);
-            return response()->json(['status' => false, 'message' => 'Internal Server Error', 'e' => $th], 500);
-        }
-    }
-
-    public function getYajmanDetails(Request $request)
-    {
-        /* all yajmans under pandit*/
-        try {
-            $panditjiId = $request->id;
-            $yajman = new yajman();
-            $yajmanDetails = $yajman->getYajmanUnderThePanditji($panditjiId);
-            if ($yajmanDetails) {
-                return response()->json(['status' => true, 'data' => $yajmanDetails], 200);
-            }
-            return response()->json(['status' => false, 'message' => 'Yajmans does not exist'], 400);
-        } catch (\Throwable $th) {
-            return response()->json(['status' => false, 'message' => 'Internal server error', 'error' => $th], 500);
-        }
-    }
-    public function getYajmanDetailsByYajmanId(Request $request, $id)
-    {
-        try {
-            $panditjiId = $request->id;
-            $yajman = new yajman();
-            $yajmanDetails = $yajman->getYajmanDetails($id);
-            // dd($yajmanDetails);
-            if ($yajmanDetails) {
-                return response()->json(['status' => true, 'message' => 'Yajman details retrived successfully', 'data' => $yajmanDetails[0]], 200);
-            }
-            return response()->json(['status' => false, 'message' => 'Yajmans does not exist'], 200);
-        } catch (\Throwable $th) {
-            return response()->json(['status' => false, 'message' => 'Internal server error', 'error' => $th], 500);
-        }
-    }
-
     public function createAppointment($panditjiId, $yajmanId, Request $request)
     {
         try {

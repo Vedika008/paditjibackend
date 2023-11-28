@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+use App\Models\city;
 
 use Illuminate\Database\Eloquent\Model;
 use Log;
@@ -45,7 +46,7 @@ class yajman extends Model
             $arr = [];
             for ($i = 0; $i < count($yajmanDetails); $i++) {
                 $element = $yajmanDetails[$i];
-                $city = new city();
+                 $city = new city();
                 $data = $city->getStateWithCity($element['state'], $element['city']);
 
                 $element['state'] = $data['state'];
@@ -60,24 +61,24 @@ class yajman extends Model
     }
     public function getYajmanUnderThePanditji($PanditId)
     {
-
-
-        // dd($save);
-        $yajmansUnderPanditji = yajman::where('created_by', $PanditId)->get()->all();
-        if (count($yajmansUnderPanditji) > 0) {
-            $arr = [];
-            for ($i = 0; $i < count($yajmansUnderPanditji); $i++) {
-                $element = $yajmansUnderPanditji[$i];
-                $city = new city();
-                $data = $city->getStateWithCity($element['state'], $element['city']);
-
-                $element['state'] = $data['state'];
-                $element['city'] = $data['city'];
-                array_push($arr, $element);
+        try {
+            $yajmansUnderPanditji = yajman::where('created_by', $PanditId)->get()->all();
+            if (count($yajmansUnderPanditji) > 0) {
+                $arr = [];
+                for ($i = 0; $i < count($yajmansUnderPanditji); $i++) {
+                    $element = $yajmansUnderPanditji[$i];
+                    $city = new city();
+                    $data = $city->getStateWithCity($element['state'], $element['city']);
+                    $element['state'] = $data['state'];
+                    $element['city'] = $data['city'];
+                    array_push($arr, $element);
+                }
+                return $arr;
+            } else {
+                return false;
             }
-            return $arr;
-        } else {
-            return false;
+        } catch (\Throwable $th) {
+            dd($th);
         }
 
     }

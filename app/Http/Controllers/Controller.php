@@ -109,6 +109,17 @@ class Controller extends BaseController {
         }
         return false;
     }
+
+
+
+
+
+
+
+
+
+
+    
     public static function sendNotification($data) {
         $postdata = [
             "template"=>$data['template'],

@@ -13,13 +13,6 @@ use Cache;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Carbon;
 
-
-
-
-
-
-
-
 class AuthController extends Controller
 {
     /**
