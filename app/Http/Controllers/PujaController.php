@@ -14,7 +14,6 @@ class PujaController extends Controller
 
     public function __construct()
     {
-
     }
 
     // puja Creation
@@ -55,7 +54,6 @@ class PujaController extends Controller
                     return response()->json(['status' => false, 'error' => 'Something went wrong', "message" => 'Creation of puja failed'], 200);
                 }
             }
-
         } catch (\Throwable $th) {
             dd($th);
             return response()->json(['status' => false, 'message' => 'Internal Server Error', 'error' => $th], 500);
@@ -70,14 +68,12 @@ class PujaController extends Controller
             $poojaList = $pooja->getPoojalist();
 
             if ($poojaList == false) {
-                return response()->json(['status' => false, 'message' =>'No puja created' ,'data' => []], 200);
-            } else {
-                return response()->json(['status' => true, 'message' => 'Pooja list retrived successfully', 'data' => $poojaList], 200);
+                return response()->json(['status' => false, 'message' => 'No puja created', 'data' => []], 200);
             }
+            return response()->json(['status' => true, 'message' => 'Pooja list retrived successfully', 'data' => $poojaList], 200);
         } catch (\Throwable $th) {
             return response()->json(['status' => false, 'message' => 'Internal server error'], 500);
         }
-
     }
 
     // get all puja materials that require for the pujaaaa
@@ -97,5 +93,4 @@ class PujaController extends Controller
             return response()->json(['status' => false, 'message' => 'Internal server error'], 500);
         }
     }
-
 }
