@@ -50,8 +50,11 @@ class Controller extends BaseController {
         return Carbon::now();
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
      public static function sendSms($num, $msg) {
 =======
+=======
+>>>>>>> 90367ef05cfbd6cc8463f57f3e5f77c3184d62df
 
     public static function sendSms($num, $msg) {
 >>>>>>> 90367ef05cfbd6cc8463f57f3e5f77c3184d62df
@@ -78,9 +81,13 @@ class Controller extends BaseController {
     public function use(){
         return true;
     }
+<<<<<<< HEAD
 
 }
 =======
     }
+}
+>>>>>>> 90367ef05cfbd6cc8463f57f3e5f77c3184d62df
+=======
 }
 >>>>>>> 90367ef05cfbd6cc8463f57f3e5f77c3184d62df
