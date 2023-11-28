@@ -6,8 +6,6 @@
     "type": "project",
     "require": {
         "php": "^8.0",
-        "darkaonline/l5-swagger": "^8.5",
-        "darkaonline/swagger-lume": "^10.1",
         "flipbox/lumen-generator": "^9.2",
         "guzzlehttp/guzzle": "^7.8",
         "illuminate/notifications": "^9.52",

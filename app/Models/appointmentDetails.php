@@ -24,7 +24,14 @@ class appointmentDetails extends Model
         } else {
             return false;
         }
-
-
+    }
+     
+    public function getAppointmentDetailsByID($appointmentId){
+        $yajmanDetail = appointmentDetails :: where('id',$appointmentId)->get()->all();
+        if(count($yajmanDetail)>0){
+            return $yajmanDetail;
+        }else{
+            return false;
+        }
     }
 }

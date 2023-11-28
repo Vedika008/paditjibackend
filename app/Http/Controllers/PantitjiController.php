@@ -227,61 +227,6 @@ class PantitjiController extends Controller
             return response()->json(['status' => false, 'message' => 'Internal server error'], 500);
         }
     }
-    public function createAppointment($panditjiId, $yajmanId, Request $request)
-    {
-        try {
-            // firstly if checak yajman exist
-            $yajman = new yajman();
-            $yajmanExist = $yajman->getYajmanDetails($yajmanId);
-            // dd($yajmanExist);
-            if ($yajmanExist == false) {
-                return response()->json(['status' => false, 'message' => 'yajman does not exist'], 400);
-            } else {
-                // id, yajman_name, yajman_mobile_no, state, city, address, date, pooja, other_pooja, pooja_material, created_at, updated_at, created_by
-                $input = $request->all();
-                $apnt = new appointmentDetails();
-                // dd($input);
-                $apnt->yajman_name = $input['yajman_name'];
-                $apnt->yajman_mobile_no = $input['yajman_mobile_no'];
-                $apnt->state = $input['state'];
-                $apnt->city = $input['city'];
-                $apnt->address = $input['address'];
-                $apnt->date = $input['date'];
-                $apnt->pooja = $input['pooja'];
-                $apnt->other_pooja = $input['other_pooja'];
-                $apnt->pooja_material = $input['pooja_material'];
-                $apnt->created_by = $panditjiId;
-                $save = $apnt->save();
-                // dd($apnt->save());
-                if ($save) {
-                    return response()->json(['status' => true, 'message' => 'Yajman created successfully'], 200);
-                } else {
-                    return response()->json(['status' => false, 'message' => 'Something went wrong'], 500);
-                }
-            }
-        } catch (\Throwable $th) {
-            dd($th);
-            return response()->json(['status' => false, 'message' => 'Internal server error'], 500);
-        }
-    }
-
-    public function getAppointmentDetails($panditjiId)
-    {
-        try {
-            $apt = new appointmentDetails();
-            $appointmentDetails = $apt->getAppointmentDetails($panditjiId);
-
-            if ($appointmentDetails == false) {
-                return response()->json(['status' => false, 'message' => 'No more appointments under this panditji'], 400);
-            } else {
-                return response()->json(['status' => true, 'message' => 'Appointment details retrived successfully', 'data' => $appointmentDetails], 200);
-            }
-        } catch (\Throwable $th) {
-            dd($th);
-            return response()->json(['status' => false, 'message' => 'Internal server error'], 500);
-        }
-    }
-
     public function listOfYajmanUnderThePanditji(Request $request)
     {
         try {

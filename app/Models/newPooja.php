@@ -37,4 +37,21 @@ class newPooja extends Model
 
     return false;
     }
+
+    public function getPoojaById($id){
+        $pooja = newPooja :: where('id',$id)->get()->all();
+
+        if (count($pooja) > 0) {
+            $decodedPoojaList = [];
+            foreach ($pooja as $pooja) {
+                $decodedPooja = $pooja->toArray(); 
+                $decodedPooja['pooja_material'] = json_decode($pooja->pooja_material, true); 
+                $decodedPoojaList[] = $decodedPooja;
+                
+            }
+            return $decodedPoojaList;
+        }else{
+            return false;
+        }
+    }
 }

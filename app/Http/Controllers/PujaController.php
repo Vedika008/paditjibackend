@@ -32,22 +32,10 @@ class PujaController extends Controller
             } else {
                 //craete pooja
                 $pooja = new newPooja();
-
-                // id, pooja_name, pooja_material, created_at, updated_at, created_by, materialid, materialName, materialQuantity
-
                 $pooja->pooja_name = $input['pooja_name'];
-                $pooja->pooja_material = json_encode($input['pooja_material']); // Serialize the nested object
-
-                // $pooja->pooja_material = json_encode($input['pooja_material']); 
-                // $personalInfo = $input['pooja_material'];
-                // $pooja-> materialid = $personalInfo['materialid'];
-                // $pooja->materialName = $personalInfo['materialName'];
-                // $pooja->materialQuantity = $personalInfo['materialQuantity'];
+                $pooja->pooja_material = json_encode($input['pooja_material']);          
                 $pooja->created_by = $panditjiId;
-
                 $save = $pooja->save();
-
-
                 if ($save) {
                     return response()->json(['status' => true, 'message' => "Pooja added successfullly"], 200);
                 } else {
@@ -93,4 +81,50 @@ class PujaController extends Controller
             return response()->json(['status' => false, 'message' => 'Internal server error'], 500);
         }
     }
+
+    public function getPujaById (Request $request , $id){
+        try {
+            $pooja = new newPooja();
+            $poojaMaterial = $pooja->getPoojaById($id);
+                // dd($poojaMaterial);
+
+            if ($poojaMaterial == false) {
+                return response()->json(['status' => false, 'message' => 'No puja created for this id', 'data' => []], 500);
+            } else {
+                return response()->json(['status' => true, 'message' => 'Pooja Material retrived successfully', 'data' => $poojaMaterial[0]], 200);
+            }
+        } catch (\Throwable $th) {
+            dd($th);
+            return response()->json(['status' => false, 'message' => 'Internal server error'], 500);
+        }
+    }
+
+    // update
+    public function updatePooja(Request $request, $id)
+    {
+        try {
+            $pooja = newPooja::find($id);
+    
+            if (!$pooja) {
+                return response()->json(['status' => false, 'message' => 'Pooja not found'], 404);
+            }
+    
+            $input = $request->all();
+   
+            $pooja->pooja_name = $input['pooja_name'] ?? $pooja->pooja_name;
+            $pooja->pooja_material = json_encode($input['pooja_material'] ?? $pooja->pooja_material);
+    
+            // Save the updated Pooja
+            $save = $pooja->save();
+    
+            if ($save) {
+                return response()->json(['status' => true, 'message' => "Pooja updated successfully"], 200);
+            } else {
+                return response()->json(['status' => false, 'error' => 'Something went wrong', "message" => 'Update of pooja failed'], 500);
+            }
+        } catch (\Throwable $th) {
+            return response()->json(['status' => false, 'message' => 'Internal Server Error', 'error' => $th], 500);
+        }
+    }
+    
 }

@@ -39,14 +39,6 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
 
     $router->post('/panditji/generateOtp/{mobilenumber}', 'PantitjiController@generateOTP');
 
-    // create yajman
-    // $router->post('/panditji/{panditjiId}/create/yajman', 'PantitjiController@yajmanCreation');
-
-
-    //create pooja appointemnt
-    $router->post('/panditji/{panditjiId}/createAppoinment/{yajmanId}', 'PantitjiController@createAppointment');
-    $router->get('/panditji/{panditjiId}/getAppointmentDetails', 'PantitjiController@getAppointmentDetails');
-
     // register
     $router->get('/register/checkAndGenerateOtp/{mobilenumber}', 'AuthController@otpforRegister');
     $router->post('/verifyOtp', 'AuthController@otpVerify');
@@ -67,8 +59,19 @@ $router->group(['prefix' => 'api/v1/pandit/poojaMaterial/', 'middleware' => 'aut
     $router->post('create', 'PujaController@addPuja');
 
     $router->get('view', 'PujaController@getAllPujaThatCreated');
-    // $router->put('update/{id}', 'PujaController@addPuja');
+    $router->get('view/{id}','PujaController@getPujaById');
+    $router->put('update/{id}', 'PujaController@updatePooja');
     // $router->delete('dalete/{id}', 'PujaController@addPuja');
 
     $router->get('getPujaMaterial','PujaController@getAllPoojaMaterials');
+});
+
+$router->group(['prefix' => 'api/v1/pandit/appointment', 'middleware' => 'auth'], function () use ($router) {
+    /*Appointment apis for yajman */
+    $router->post('createAppoinment/{yajmanId}', 'AppointmentController@createAppointment');
+    $router->get('view', 'AppointmentController@getAppointmentDetails');
+    $router->get('view/{id}', 'AppointmentController@getAppointmentById');
+
+
+
 });
