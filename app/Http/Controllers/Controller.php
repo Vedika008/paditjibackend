@@ -2,40 +2,10 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Support\Carbon;
-ini_set('memory_limit', '-1');
-error_log(print_r($_REQUEST,true));
 use Laravel\Lumen\Routing\Controller as BaseController;
 use DB;
 use Log;
-/**
- * Class Controller
- * @package App\Http\Controllers
- * @OA\OpenApi(
- *     @OA\Info(
- *         description="Docexa Doctor Micro Service API",
- *         version="1.0.0",
- *         title="Docexa Doctor Micro Service API staging",
- *         termsOfService = "https://docexa.com/",
- *         @OA\Contact(email="satish.soni@globalspace.in")
- *     ),
- *     @OA\Server(
- *          url= "http://staging.docexa.com/api/v3"
- *     ),
- *     @OA\Server(
- *          url= "https://staging.docexa.com/api/v3"
- *     ),
- *     @OA\Server(
- *          url= "http://staging.docexa.com/api/v2"
- *     ),
- *     @OA\Server(
- *          url= "https://staging.docexa.com/api/v2"
- *     ),
- *     @OA\Tag(
- *        name="Doctors",
- *        description="Everything about your Doctors",
- * ),
- * )
- */
+
 class Controller extends BaseController {
 
 
@@ -49,15 +19,8 @@ class Controller extends BaseController {
     {
         return Carbon::now();
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-     public static function sendSms($num, $msg) {
-=======
-=======
->>>>>>> 90367ef05cfbd6cc8463f57f3e5f77c3184d62df
 
     public static function sendSms($num, $msg) {
->>>>>>> 90367ef05cfbd6cc8463f57f3e5f77c3184d62df
         $fullApi = "http://enterprise.smsgupshup.com/GatewayAPI/rest?method=SendMessage&send_to={num}&msg={msg}&msg_type=TEXT&userid=2000153330&auth_scheme=plain&password=nbm0jALBl&v=1.1&format=text&mask=GSTDOC";
         $msg = urlencode($msg);
 
@@ -76,18 +39,6 @@ class Controller extends BaseController {
             return true;
         }
         return false;
-<<<<<<< HEAD
-    } 
-    public function use(){
-        return true;
     }
-<<<<<<< HEAD
+}
 
-}
-=======
-    }
-}
->>>>>>> 90367ef05cfbd6cc8463f57f3e5f77c3184d62df
-=======
-}
->>>>>>> 90367ef05cfbd6cc8463f57f3e5f77c3184d62df
