@@ -86,7 +86,7 @@ $app->middleware([
 ]);
 
 $app->routeMiddleware([
-    'auth' => App\Http\Middleware\Authenticate::class    
+    'auth' => App\Http\Middleware\Authenticate::class
 ]);
 
 
@@ -108,6 +108,8 @@ $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
 $app->register(Illuminate\Notifications\NotificationServiceProvider::class);
 
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
+$app->register(\L5Swagger\L5SwaggerServiceProvider::class);
+
 
 
 $app->events->listen(sendOtpNotification::class, notificationSend::class);
