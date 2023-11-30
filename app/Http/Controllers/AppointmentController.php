@@ -192,7 +192,7 @@ class AppointmentController extends Controller
             $appointmentDetails = $apt->getAppointmentDetails($panditjiId);
 
             if ($appointmentDetails == false) {
-                return response()->json(['status' => false, 'message' => 'No more appointments under this panditji', 'data' => []], 400);
+                return response()->json(['status' => false, 'message' => 'No more appointments under this panditji', 'data' => []], 200);
             } else {
                 return response()->json(['status' => true, 'message' => 'Appointment details retrived successfully', 'data' => $appointmentDetails], 200);
             }

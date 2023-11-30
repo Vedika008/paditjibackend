@@ -52,7 +52,9 @@ class PanditjiRegistration extends Model implements JWTSubject
 
     public function getPandithjiDetails($mobile_number)
     {
-        $panditjiRegistrationDetails = PanditjiRegistration::where('mobile_number', $mobile_number)->first();
+        $panditjiRegistrationDetails = PanditjiRegistration::where('mobile_number', $mobile_number)
+        ->orderBy('created_at', 'asc')
+        ->first();
         if ($panditjiRegistrationDetails !== null) {
             return $panditjiRegistrationDetails;
         }else{

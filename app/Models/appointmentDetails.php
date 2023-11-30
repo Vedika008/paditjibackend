@@ -31,7 +31,9 @@ class appointmentDetails extends Model
     public function getAppointmentDetails($panditId)
     {
         try {
-            $yajmanDetails = appointmentDetails::where('created_by', $panditId)->get();
+            $yajmanDetails = appointmentDetails::where('created_by', $panditId)
+            ->orderBy('created_at', 'asc')
+            ->get();
             // dd($yajmanDetails);
 
             if (count($yajmanDetails) > 0) {
@@ -68,7 +70,9 @@ class appointmentDetails extends Model
     {
 
         try {
-            $yajmanDetail = appointmentDetails::where('id', $appointmentId)->get();
+            $yajmanDetail = appointmentDetails::where('id', $appointmentId)
+            ->orderBy('created_at', 'asc')
+            ->get();
 
             // if(count($yajmanDetail)>0){
             //     return $yajmanDetail;

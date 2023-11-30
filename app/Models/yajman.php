@@ -30,7 +30,9 @@ class yajman extends Model
 
     public function cheackYajmanExist($panditiId, $mobile_number)
     {
-        $yajmanExistOrnot = yajman::where('created_by', $panditiId)->where('mobile_number', $mobile_number)->exists();
+        $yajmanExistOrnot = yajman::where('created_by', $panditiId)->where('mobile_number', $mobile_number)
+        ->orderBy('created_at', 'asc') 
+        ->exists();
         // dd($yajmanExistOrnot);
 
         if ($yajmanExistOrnot) {

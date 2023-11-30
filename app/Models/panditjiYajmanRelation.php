@@ -17,7 +17,9 @@ class panditjiYajmanRelation extends Model
     ];
 
     public function paditjiYajmanRelationExist($panditjiId,$yajmanId){
-        $exist = panditjiYajmanRelation :: where ('pantiji_id',$panditjiId) ->where ('yajman_id',$yajmanId)->exist();
+        $exist = panditjiYajmanRelation :: where ('pantiji_id',$panditjiId) ->where ('yajman_id',$yajmanId)
+        ->orderBy('created_at', 'asc')
+        ->exist();
 
         if($exist){
             return true;
