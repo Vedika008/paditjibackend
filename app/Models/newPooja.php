@@ -41,6 +41,8 @@ class newPooja extends Model
     public function getPoojaById($id){
         $pooja = newPooja :: where('id',$id)->get()->all();
 
+        
+
         if (count($pooja) > 0) {
             $decodedPoojaList = [];
             foreach ($pooja as $pooja) {

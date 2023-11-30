@@ -6,6 +6,22 @@ use Laravel\Lumen\Routing\Controller as BaseController;
 use DB;
 use Log;
 
+/**
+ * Class Controller
+ * @package App\Http\Controllers
+ * @OA\OpenApi(
+ *     @OA\Info(
+ *         description="Panditji Micro Service API",
+ *         version="1.0.0",
+ *         title="Panditji Micro Service API Development",
+ *         termsOfService = "https://panditjisamagri.com/",
+ *         @OA\Contact(email="satish.soni@globalspace.in")
+ *     ),
+ *     @OA\Server( 
+ *          url= "https://panditjisamagri.com/"
+ *     ),
+ * )
+ */
 class Controller extends BaseController {
 
 
@@ -39,6 +55,15 @@ class Controller extends BaseController {
             return true;
         }
         return false;
+    }
+
+    protected function respondWithToken($token)
+    {
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => auth()->factory()->getTTL() * 60
+        ]);
     }
 }
 

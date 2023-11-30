@@ -31,6 +31,57 @@ class AuthController extends Controller
         return response()->json(['access_token' => $accessToken]);
     }
 
+ /**
+     * Operation login
+     *
+     *
+     * @return Http response
+     */
+
+    /**
+     * @OA\Post(
+     *      path="/api/v1/login/verify",
+     *      operationId="login",
+     *      tags={"Login"},
+     *      summary="Login authentication",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent( 
+     *                      @OA\Property(property="mobileNumber", type="string"),
+     *                      @OA\Property(property="otp", type="string"),
+     *        ),
+     *     ),
+     *     @OA\Response(
+     *          response=200, description="Success",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="true"),
+     *             @OA\Property(property="code",type="integer", example="200"),
+     *             @OA\Property(property="message",type="string", example="Login verified"),
+     *             @OA\Property(property="data",type="object")
+     *          )
+     *       ),
+     *    @OA\Response(
+     *          response=403, description="Internal Server Error",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="false"),
+     *             @OA\Property(property="code",type="integer", example="403"),
+     *             @OA\Property(property="message", type="string", example="Login failed")
+     *          )
+     *       ),
+     *     @OA\Response(
+     *          response=500, description="Internal Server Error",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="false"),
+     *             @OA\Property(property="code",type="integer", example="500"),
+     *             @OA\Property(property="message", type="string", example="Internal Server Error")
+     *          )
+     *       )
+     *  )
+     */
+
     public function LoginVerify(Request $request)
     {
         $input = $request->all();
@@ -44,9 +95,13 @@ class AuthController extends Controller
             $panditji = PanditjiRegistration::where('mobile_number', $mobileNumber)->first();
             Cache::forget('otp' . $input['mobileNumber']);
             if ($panditji) {
-                $token = JWTAuth::fromUser($panditji,[
-                    'exp' => Carbon ::now()->addHours(1)->timestamp ]
-                );
+
+                // $token = JWTAuth::fromUser($panditji);
+                $expiration = Carbon::now()->addDays(100);
+                // dd($expiration->timestamp);
+
+                $token = JWTAuth::fromUser($panditji, ['exp' => $expiration->timestamp]);
+
 
                 $panditji->community = json_decode($panditji->community);
                 $panditji->other_community = json_decode($panditji->other_community);
@@ -68,6 +123,49 @@ class AuthController extends Controller
             return response()->json(['status' => false, 'message' => 'OTP verification failed'], 401);
         }
     }
+
+     /**
+     * Operation generteOTPForLogin
+     *
+     *
+     *
+     * @return Http response
+     */
+
+    /**
+     * @OA\Get(
+     *      path="/api/v1/login/checkAndGenerateOtp/{mobilenumber}",
+     *      operationId="generteOTPForLogin",
+     *      tags={"Login"},
+     *      summary="Cheak and generate mobile OTP",
+     *      @OA\Parameter(
+     *         name="mobilenumber",
+     *         in="path",
+     *         example=7499670180,
+     *         required=true,
+     *         description="mobilenumber",
+     *         @OA\Schema(type="integer")
+     *     ),
+     * 
+     *     @OA\Response(
+     *          response=200, description="Success",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="true"),
+     *             @OA\Property(property="code",type="integer", example="200"),
+     *             @OA\Property(property="OTP",type="object")
+     *          )
+     *       ),
+     *     @OA\Response(
+     *          response=500, description="Internal Server Error",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="false"),
+     *             @OA\Property(property="message", type="string", example="Internal Server Error")
+     *          )
+     *       )
+     *  )
+     */   
 
     public function otpGenerateForLogin($mobilenumber)
     {
@@ -98,6 +196,50 @@ class AuthController extends Controller
     }
 
     // for register
+
+ /**
+     * Operation generateOTP
+     *
+     *
+     *
+     * @return Http response
+     */
+
+    /**
+     * @OA\Get(
+     *      path="/api/v1/register/checkAndGenerateOtp/{mobilenumber}",
+     *      operationId="generateOTP",
+     *      tags={"Pandiji Registration"},
+     *      summary="Cheak and generate mobile OTP",
+     *      @OA\Parameter(
+     *         name="mobilenumber",
+     *         in="path",
+     *         example=7499670180,
+     *         required=true,
+     *         description="mobilenumber",
+     *         @OA\Schema(type="integer")
+     *     ),
+     * 
+     *     @OA\Response(
+     *          response=200, description="Success",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="true"),
+     *             @OA\Property(property="code",type="integer", example="200"),
+     *             @OA\Property(property="OTP",type="object")
+     *          )
+     *       ),
+     *     @OA\Response(
+     *          response=500, description="Internal Server Error",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="false"),
+     *             @OA\Property(property="message", type="string", example="Internal Server Error")
+     *          )
+     *       )
+     *  )
+     */   
+
     public function otpforRegister($mobilenumber)
     {
         try {
@@ -123,6 +265,62 @@ class AuthController extends Controller
             return response()->json(['status' => false, 'message' => 'Internal server error'], 500);
         }
     }
+
+
+     /**
+     * Operation VerifyOtp
+     *
+     *
+     * @return Http response
+     */
+
+    /**
+     * @OA\Post(
+     *      path="/api/v1/verifyOtp",
+     *      operationId="VerifyOtp",
+     *      tags={"Pandiji Registration","Login"},
+     *      summary="Verify OTP",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent( 
+     *                      @OA\Property(property="mobileNumber", type="string"),
+     *                      @OA\Property(property="otp", type="string"),
+     *        ),
+     *     ),
+     *     @OA\Response(
+     *          response=200, description="Success",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="true"),
+     *             @OA\Property(property="code",type="integer", example="200"),
+     *             @OA\Property(property="message",type="string", example="OTP verified successfully"),
+     *             @OA\Property(property="data",type="object")
+     *          )
+     *       ),
+     *    @OA\Response(
+     *          response=403, description="Internal Server Error",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="false"),
+     *             @OA\Property(property="code",type="integer", example="403"),
+     *             @OA\Property(property="message", type="string", example="OTP verification failed")
+     *          )
+     *       ),
+     *     @OA\Response(
+     *          response=500, description="Internal Server Error",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="false"),
+     *             @OA\Property(property="code",type="integer", example="500"),
+     *             @OA\Property(property="message", type="string", example="Internal Server Error")
+     *          )
+     *       )
+     *  )
+     */
+    // panditji registration
+
+
+
     public function otpVerify(Request $request)
     {
         try {

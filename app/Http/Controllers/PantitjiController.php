@@ -19,7 +19,80 @@ use DB;
 
 class PantitjiController extends Controller
 {
-// panditji registration
+    /**
+     * Operation Register
+     *
+     *
+     * @return Http response
+     */
+
+    /**
+     * @OA\Post(
+     *      path="/api/v1/panditji/register",
+     *      operationId="Register",
+     *      tags={"Pandiji Registration"},
+     *      summary="Register a panditji",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              @OA\Property(property="personal_info", type="object",   
+     *                      @OA\Property(property="title", type="string"),
+     *                      @OA\Property(property="other_title",type="string"), 
+     *                      @OA\Property(property="first_name", type="string" ,example ="vedika"),
+     *                      @OA\Property(property="last_name", type="string",example ="jaware"),
+     *                      @OA\Property(property="state", type="string",example="1"),
+     *                      @OA\Property(property="district", type="string" ,example ="2"),
+     *                      @OA\Property(property="address", type="string", example ="Mumbai")
+     *                 ),
+     *            @OA\Property(property="auth", type="object",   
+     *                      @OA\Property(property="mobile_number", type="string" , example="7499670180"),
+     *                 ),
+     *            @OA\Property(property="community_and_language", type="object", 
+     *                      @OA\Property(property="community",type="array",  @OA\Items(type="integer"), description="Array of community IDs"),
+     *                      @OA\Property(property="othercommunity", type="string"),
+     *                      @OA\Property(property="languages",type="array",  @OA\Items(type="integer"), description="Array of languages IDs"),
+     *                      @OA\Property(property="otherlanguages", type="string")
+     *             ),
+     *            @OA\Property(property="other_info", type="object",   
+     *                      @OA\Property(property="working_time", type="string"),
+     *                      @OA\Property(property="experience", type="string"),
+     *                      @OA\Property(property="poojas_can",type="array",  @OA\Items(type="integer"), description="Array of poojas IDs"),
+     *                      @OA\Property(property="otherlanguages", type="string"),
+     *                      @OA\Property(property="working_in_temple", type="boolean"),
+     *             ),
+     *        ),
+     *     ),
+     *     @OA\Response(
+     *          response=200, description="Success",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="true"),
+     *             @OA\Property(property="code",type="integer", example="200"),
+     *             @OA\Property(property="message",type="string", example="Panditji Registration Successful"),
+     *             @OA\Property(property="data",type="object")
+     *          )
+     *       ),
+     *    @OA\Response(
+     *          response=403, description="Internal Server Error",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="false"),
+     *             @OA\Property(property="code",type="integer", example="403"),
+     *             @OA\Property(property="message", type="string", example="Panfitji Registration Failed")
+     *          )
+     *       ),
+     *     @OA\Response(
+     *          response=500, description="Internal Server Error",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="false"),
+     *             @OA\Property(property="code",type="integer", example="500"),
+     *             @OA\Property(property="message", type="string", example="Internal Server Error")
+     *          )
+     *       )
+     *  )
+     */
+    // panditji registration
     public function PanditjiRegistration(Request $request)
     {
         try {
@@ -68,17 +141,85 @@ class PantitjiController extends Controller
                 return response()->json(["status" => false, "message" => "Panditji is already exist"], 200);
             }
         } catch (\Throwable $th) {
+            // dd($th);
+            return response()->json(['status' => false, 'message' => 'Internal Server Error'], 500);
+        }
+    }
+
+    public function getProfile(Request $request)
+    {
+        try {
+            // dd(isset($request->id), $request->id);
+            if (isset($request->id)) {
+                $pandit = PanditjiRegistration::where('id', $request->id)->first();
+                $pandit->community = json_decode($pandit->community);
+                $pandit->other_community = json_decode($pandit->other_community);
+                $pandit->language = json_decode($pandit->language);
+                $pandit->other_language = json_decode($pandit->other_language);
+                $pandit->poojasPerformed = json_decode($pandit->poojasPerformed);
+                $pandit->otherPooja = json_decode($pandit->otherPooja);
+                // dd($pandit->toArray());
+                return response()->json(['status' => true, 'data' => $pandit], 200);
+            }
+        } catch (\Throwable $th) {
             dd($th);
             return response()->json(['status' => false, 'message' => 'Internal Server Error'], 500);
         }
     }
-// retrive pandit registration details
+
+
+    /**
+     * Operation getPanditjiRegistrationDetails
+     *
+     *
+     *
+     * @return Http response
+     */
+
+    /**
+     * @OA\Get(
+     *      path="/api/v1/panditji/getPandithiRegistrationDetails/{mobileNumber}",
+     *      operationId="getPanditjiRegistrationDetails",
+     *      tags={"Pandiji Registration"},
+     *      summary="Get panditji registration details",
+     *      @OA\Parameter(
+     *         name="mobileNumber",
+     *         in="path",
+     *         example=7499670180,
+     *         required=true,
+     *         description="mobileNumber",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *          response=200, description="Success",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="true"),
+     *             @OA\Property(property="code",type="integer", example="200"),
+     *             @OA\Property(property="panditji_details",type="object")
+     *          )
+     *       ),
+     *     @OA\Response(
+     *          response=500, description="Internal Server Error",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="false"),
+     *             @OA\Property(property="message", type="string", example="Internal Server Error")
+     *          )
+     *       )
+     *  )
+     */
+
+
+
+
+    // retrive pandit registration details
     public function getPanditRegistrationDetails($mobileNo)
     {
         try {
             $panditji = new PanditjiRegistration();
             $data = $panditji->getPandithjiDetails($mobileNo);
-              $structuredData = [
+            $structuredData = [
                 "personal_info" => [
                     "title" => $data["title"],
                     "other_title" => $data["other_title"],
@@ -117,7 +258,47 @@ class PantitjiController extends Controller
         }
     }
 
+
+
+
+
     // community +lan+state+city apiss
+
+
+    /**
+     * Operation getUtilityDetails
+     *
+     *
+     *
+     * @return Http response
+     */
+
+    /**
+     * @OA\Get(
+     *      path="/api/v1/panditji/utility",
+     *      operationId="getUtilityDetails",
+     *      tags={"Pandiji Registration"},
+     *      summary="Get utlity details like community,languages,state,working hr ,and experience",
+     *     @OA\Response(
+     *          response=200, description="Success",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="true"),
+     *             @OA\Property(property="code",type="integer", example="200"),
+     *             @OA\Property(property="utility_details",type="object")
+     *          )
+     *       ),
+     *     @OA\Response(
+     *          response=500, description="Internal Server Error",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="false"),
+     *             @OA\Property(property="message", type="string", example="Internal Server Error")
+     *          )
+     *       )
+     *  )
+     */
+
     public function getUtilityDetails()
     {
         try {
@@ -141,7 +322,7 @@ class PantitjiController extends Controller
             $experienceList = $panditjiExperience->getExperienceList();
 
             if ($PoojaList) {
-                return response()->json(['status' => true, 'message' => 'Data retrived successfully', 'data' => ['pooja' => $PoojaList, 'community' => $CommunityList, 'language' => $languageList, 'state' => $stateList, 'workingHrList' => $workingHrList, 'experienceList' => $experienceList]], 200);
+                return response()->json(['status' => true, 'message' => 'Data retrived successfully', 'data' => ['community' => $CommunityList, 'language' => $languageList, 'state' => $stateList, 'workingHrList' => $workingHrList, 'experienceList' => $experienceList]], 200);
             }
             return response()->json(['status' => false, 'message' => 'something went wrong'], 500);
         } catch (\Throwable $th) {
@@ -150,6 +331,41 @@ class PantitjiController extends Controller
     }
 
     // extra apis
+
+
+    /**
+     * Operation poojaperformed
+     *
+     *
+     *
+     * @return Http response
+     */
+
+    /**
+     * @OA\Get(
+     *      path="/api/v1/pandiji/poojasPerformed",
+     *      operationId="poojaperformed",
+     *      tags={"Pandiji Registration"},
+     *      summary="Get pooja performed",
+     *     @OA\Response(
+     *          response=200, description="Success",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="true"),
+     *             @OA\Property(property="code",type="integer", example="200"),
+     *             @OA\Property(property="pooja_details",type="object")
+     *          )
+     *       ),
+     *     @OA\Response(
+     *          response=500, description="Internal Server Error",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="false"),
+     *             @OA\Property(property="message", type="string", example="Internal Server Error")
+     *          )
+     *       )
+     *  )
+     */
     public function getPoojasPerformedList()
     {
         try {
@@ -166,6 +382,40 @@ class PantitjiController extends Controller
         }
     }
 
+
+    /**
+     * Operation getCommunityList
+     *
+     *
+     *
+     * @return Http response
+     */
+
+    /**
+     * @OA\Get(
+     *      path="/api/v1/pandiji/community",
+     *      operationId="getCommunityList",
+     *      tags={"Pandiji Registration"},
+     *      summary="Get community list",
+     *     @OA\Response(
+     *          response=200, description="Success",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="true"),
+     *             @OA\Property(property="code",type="integer", example="200"),
+     *             @OA\Property(property="community details",type="object")
+     *          )
+     *       ),
+     *     @OA\Response(
+     *          response=500, description="Internal Server Error",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="false"),
+     *             @OA\Property(property="message", type="string", example="Internal Server Error")
+     *          )
+     *       )
+     *  )
+     */
     public function getCommunityList()
     {
         try {
@@ -182,6 +432,39 @@ class PantitjiController extends Controller
         }
     }
 
+    /**
+     * Operation getLanguageList
+     *
+     *
+     *
+     * @return Http response
+     */
+
+    /**
+     * @OA\Get(
+     *      path="/api/v1/panditji/language",
+     *      operationId="getLanguageList",
+     *      tags={"Pandiji Registration"},
+     *      summary="Get language list",
+     *     @OA\Response(
+     *          response=200, description="Success",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="true"),
+     *             @OA\Property(property="code",type="integer", example="200"),
+     *             @OA\Property(property="landuage list",type="object")
+     *          )
+     *       ),
+     *     @OA\Response(
+     *          response=500, description="Internal Server Error",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="false"),
+     *             @OA\Property(property="message", type="string", example="Internal Server Error")
+     *          )
+     *       )
+     *  )
+     */
     public function getLanguageList()
     {
         try {
@@ -198,6 +481,39 @@ class PantitjiController extends Controller
         }
     }
 
+    /**
+     * Operation getState
+     *
+     *
+     *
+     * @return Http response
+     */
+
+    /**
+     * @OA\Get(
+     *      path="/api/v1/panditji/states",
+     *      operationId="getState",
+     *      tags={"Pandiji Registration"},
+     *      summary="Get state list",
+     *     @OA\Response(
+     *          response=200, description="Success",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="true"),
+     *             @OA\Property(property="code",type="integer", example="200"),
+     *             @OA\Property(property="state details",type="object")
+     *          )
+     *       ),
+     *     @OA\Response(
+     *          response=500, description="Internal Server Error",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="false"),
+     *             @OA\Property(property="message", type="string", example="Internal Server Error")
+     *          )
+     *       )
+     *  )
+     */
     public function stateList()
     {
         try {
@@ -213,6 +529,48 @@ class PantitjiController extends Controller
         }
     }
 
+    /**
+     * Operation getCity
+     *
+     *
+     *
+     * @return Http response
+     */
+
+    /**
+     * @OA\Get(
+     *      path="/api/v1/panditji/cities/{stateId}",
+     *      operationId="getCity",
+     *      tags={"Pandiji Registration"},
+     *      summary="Get city list",
+     *      @OA\Parameter(
+     *         name="stateId",
+     *         in="path",
+     *         example=21,
+     *         required=true,
+     *         description="stateId",
+     *         @OA\Schema(type="integer")
+     *     ),
+     * 
+     *     @OA\Response(
+     *          response=200, description="Success",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="true"),
+     *             @OA\Property(property="code",type="integer", example="200"),
+     *             @OA\Property(property="city details",type="object")
+     *          )
+     *       ),
+     *     @OA\Response(
+     *          response=500, description="Internal Server Error",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="false"),
+     *             @OA\Property(property="message", type="string", example="Internal Server Error")
+     *          )
+     *       )
+     *  )
+     */
     public function citiesList($stateId)
     {
         try {
@@ -227,6 +585,7 @@ class PantitjiController extends Controller
             return response()->json(['status' => false, 'message' => 'Internal server error'], 500);
         }
     }
+
     public function listOfYajmanUnderThePanditji(Request $request)
     {
         try {

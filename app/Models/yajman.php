@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+
 use App\Models\city;
 
 use Illuminate\Database\Eloquent\Model;
@@ -40,17 +41,22 @@ class yajman extends Model
 
     public function getYajmanDetails($yajmanId)
     {
-        $yajmanDetails = yajman::where('id', $yajmanId)->get()->all();
-
+        $yajmanDetails = yajman::where('id', $yajmanId)->get();
+        // dd($yajmanDetails);
         if (count($yajmanDetails) > 0) {
             $arr = [];
             for ($i = 0; $i < count($yajmanDetails); $i++) {
                 $element = $yajmanDetails[$i];
-                 $city = new city();
+                $city = new city();
                 $data = $city->getStateWithCity($element['state'], $element['city']);
+                // dd($data);
+                $element['state_id'] = $element['state'];
+                $element['city_id'] = $element['city'];
 
                 $element['state'] = $data['state'];
                 $element['city'] = $data['city'];
+
+
                 array_push($arr, $element);
             }
             return $arr;
@@ -62,16 +68,24 @@ class yajman extends Model
     public function getYajmanUnderThePanditji($PanditId)
     {
         try {
-            $yajmansUnderPanditji = yajman::where('created_by', $PanditId)->get()->all();
+            $yajmansUnderPanditji = yajman::where('created_by', $PanditId)->get();
+            
             if (count($yajmansUnderPanditji) > 0) {
                 $arr = [];
                 for ($i = 0; $i < count($yajmansUnderPanditji); $i++) {
                     $element = $yajmansUnderPanditji[$i];
                     $city = new city();
+                    $element['state_id'] = $element['state'];
+                    $element['city_id'] = $element['city'];
+
                     $data = $city->getStateWithCity($element['state'], $element['city']);
                     $element['state'] = $data['state'];
                     $element['city'] = $data['city'];
+
+                                
+
                     array_push($arr, $element);
+                    // dd($arr);
                 }
                 return $arr;
             } else {
@@ -82,5 +96,7 @@ class yajman extends Model
         }
 
     }
-
+    function city(){
+            return $this->belongsTo(city::class, 'city_id');
+        }
 }

@@ -35,6 +35,9 @@ $app->withFacades();
 
 $app->withEloquent();
 
+$app->configure('swagger-lume');
+
+
 /*
 |--------------------------------------------------------------------------
 | Register Container Bindings
@@ -108,6 +111,8 @@ $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
 $app->register(Illuminate\Notifications\NotificationServiceProvider::class);
 
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
+$app->register(\SwaggerLume\ServiceProvider::class);
+
 
 // $app->register(\L5Swagger\L5SwaggerServiceProvider::class);
 

@@ -17,6 +17,66 @@ class PujaController extends Controller
     }
 
     // puja Creation
+
+ /**
+     * Operation PujaCreation
+     *
+     *
+     * @return Http response
+     */
+
+    /**
+     * @OA\Post(
+     *      path="/api/v1/pandit/poojaMaterial/create",
+     *      operationId="PujaCreation",
+     *      tags={"New Pooja"},
+     *      summary="Cration of new pooja",
+     *      @OA\Parameter(
+     *          name="Authorization",
+     *          in="header",
+     *          required=true,
+     *          description="Bearer Token",
+     *          @OA\Schema(type="string")
+     *      ),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *                     @OA\Property(property="pooja_name", type="string"),
+     *                     @OA\Property(property="pooja_material",type="array",  @OA\Items(type="string"), description="Array of pooja material"),
+     *                      @OA\Property(property="created_by",type="string" )
+     *        ),
+     *     ),
+     * 
+     *     @OA\Response(
+     *          response=200, description="Success",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="true"),
+     *             @OA\Property(property="code",type="integer", example="200"),
+     *             @OA\Property(property="message",type="string", example="Pooja added successfully"),
+     *             @OA\Property(property="data",type="object")
+     *          )
+     *       ),
+     *    @OA\Response(
+     *          response=403, description="Internal Server Error",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="false"),
+     *             @OA\Property(property="code",type="integer", example="403"),
+     *             @OA\Property(property="message", type="string", example="Pooja Creation Failed")
+     *          )
+     *       ),
+     *     @OA\Response(
+     *          response=500, description="Internal Server Error",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="false"),
+     *             @OA\Property(property="code",type="integer", example="500"),
+     *             @OA\Property(property="message", type="string", example="Internal Server Error")
+     *          )
+     *       )
+     *  )
+     */
     public function addPuja(Request $request)
     {
         try {
@@ -47,6 +107,55 @@ class PujaController extends Controller
             return response()->json(['status' => false, 'message' => 'Internal Server Error', 'error' => $th], 500);
         }
     }
+
+
+     /**
+     * Operation getPujaThatIsCreated
+     *
+     *
+     *
+     * @return Http response
+     */
+
+    /**
+     * @OA\Get(
+     *      path="/api/v1/pandit/poojaMaterial/view",
+     *      operationId="getPujaThatIsCreated",
+     *      tags={"New Pooja"},
+     *      summary="Get pujas which is craeted by the panditji",
+     *  @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          required=true,
+     *          description="id",
+     *          @OA\Schema(type="string")
+     *      ),
+     *   *  @OA\Parameter(
+     *          name="Authorization",
+     *          in="header",
+     *          required=true,
+     *          description="Bearer Token",
+     *          @OA\Schema(type="string")
+     *      ),
+     *     @OA\Response(
+     *          response=200, description="Success",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="true"),
+     *             @OA\Property(property="code",type="integer", example="200"),
+     *             @OA\Property(property="poojaCreated",type="object")
+     *          )
+     *       ),
+     *     @OA\Response(
+     *          response=500, description="Internal Server Error",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="false"),
+     *             @OA\Property(property="message", type="string", example="Internal Server Error")
+     *          )
+     *       )
+     *  )
+     */
 
     // get all puja that createded by panditji
     public function getAllPujaThatCreated()
@@ -82,6 +191,49 @@ class PujaController extends Controller
         }
     }
 
+  /**
+     * Operation getPujaById
+     *
+     *
+     *
+     * @return Http response
+     */
+
+    /**
+     * @OA\Get(
+     *      path="/api/v1/pandit/poojaMaterial/view/{id}",
+     *      operationId="getPujaById",
+     *      tags={"New Pooja"},
+     *      summary="Get puja which is craeted by the panditji",
+     *  @OA\Parameter(
+     *          name="Authorization",
+     *          in="header",
+     *          required=true,
+     *          description="Bearer Token",
+     *          @OA\Schema(type="string")
+     *      ),
+     *     @OA\Response(
+     *          response=200, description="Success",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="true"),
+     *             @OA\Property(property="code",type="integer", example="200"),
+     *             @OA\Property(property="poojaCreated",type="object")
+     *          )
+     *       ),
+     *     @OA\Response(
+     *          response=500, description="Internal Server Error",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="false"),
+     *             @OA\Property(property="message", type="string", example="Internal Server Error")
+     *          )
+     *       )
+     *  )
+     */
+
+    // get all puja that createded by panditji
+    
     public function getPujaById (Request $request , $id){
         try {
             $pooja = new newPooja();
@@ -114,7 +266,6 @@ class PujaController extends Controller
             $pooja->pooja_name = $input['pooja_name'] ?? $pooja->pooja_name;
             $pooja->pooja_material = json_encode($input['pooja_material'] ?? $pooja->pooja_material);
     
-            // Save the updated Pooja
             $save = $pooja->save();
     
             if ($save) {

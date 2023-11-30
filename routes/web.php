@@ -50,6 +50,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
 
 $router->group(['prefix' => 'api/v1/pandit/', 'middleware' => 'auth'], function () use ($router) {
     /* yajaman apis  */
+    $router->get('profile', 'PantitjiController@getProfile');
     $router->post('yajman/create', 'yajmanController@yajmanCreation');
     $router->get('getYajmans', 'yajmanController@getYajmanDetails');
     $router->get('getYajman/{id}', 'yajmanController@getYajmanDetailsByYajmanId');
@@ -59,19 +60,16 @@ $router->group(['prefix' => 'api/v1/pandit/poojaMaterial/', 'middleware' => 'aut
     $router->post('create', 'PujaController@addPuja');
 
     $router->get('view', 'PujaController@getAllPujaThatCreated');
-    $router->get('view/{id}','PujaController@getPujaById');
+    $router->get('view/{id}', 'PujaController@getPujaById');
     $router->put('update/{id}', 'PujaController@updatePooja');
     // $router->delete('dalete/{id}', 'PujaController@addPuja');
 
-    $router->get('getPujaMaterial','PujaController@getAllPoojaMaterials');
+    $router->get('getPujaMaterial', 'PujaController@getAllPoojaMaterials');
 });
 
 $router->group(['prefix' => 'api/v1/pandit/appointment', 'middleware' => 'auth'], function () use ($router) {
     /*Appointment apis for yajman */
-    $router->post('createAppoinment/{yajmanId}', 'AppointmentController@createAppointment');
+    $router->post('create', 'AppointmentController@createAppointment');
     $router->get('view', 'AppointmentController@getAppointmentDetails');
     $router->get('view/{id}', 'AppointmentController@getAppointmentById');
-
-
-
 });
