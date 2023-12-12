@@ -55,7 +55,7 @@ class yajmanController extends Controller
      *          @OA\JsonContent(
      *                     @OA\Property(property="yajman_id", type="string", example="1"),
      *                      @OA\Property(property="yajman_name", type="string", example="mahesh"),
-     *                      @OA\Property(property="mobile_number",type="string" ,example= "7499670180"), 
+     *                      @OA\Property(property="mobile_number",type="string" ,example= "7499670180"),
      *                      @OA\Property(property="state", type="string" ,example ="21"),
      *                      @OA\Property(property="city", type="string",example ="384"),
      *                      @OA\Property(property="address", type="string",example="Gandhi square anjangaon bari"),
@@ -108,7 +108,6 @@ class yajmanController extends Controller
             } else {
                 $yajman = new yajman();
                 $yajmanExist = $yajman->cheackYajmanExist($panditjiId, $input['mobile_number']);
-                // dd($yajmanExist);
                 if ($yajmanExist) {
                     return response()->json(['status' => false, 'message' => 'Mobile Number Already exist'], 400);
                 } else {
@@ -372,7 +371,7 @@ class yajmanController extends Controller
      *          @OA\JsonContent(
      *                     @OA\Property(property="yajman_id", type="string", example="1"),
      *                      @OA\Property(property="yajman_name", type="string", example="mahesh"),
-     *                      @OA\Property(property="mobile_number",type="string" ,example= "7499670180"), 
+     *                      @OA\Property(property="mobile_number",type="string" ,example= "7499670180"),
      *                      @OA\Property(property="state", type="string" ,example ="21"),
      *                      @OA\Property(property="city", type="string",example ="384"),
      *                      @OA\Property(property="address", type="string",example="Gandhi square anjangaon bari"),
@@ -409,7 +408,7 @@ class yajmanController extends Controller
      *          )
      *       )
      *  )
-     */ 
+     */
 
      public function updateYajmanDetails(Request $request,$id){
         try {
@@ -435,7 +434,7 @@ class yajmanController extends Controller
                     return response()->json(['status' => false, 'error' => 'Something went wrong', 'message' => "Yajman updatation Failed"], 500);
                 }
             }
-            
+
         } catch (\Throwable $th) {
             return response()->json(['status' => false,"message" => 'Internal server error'], 200);
 
