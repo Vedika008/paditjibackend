@@ -41,9 +41,12 @@ class yajman extends Model
         return false;
     }
 
-    public function getYajmanDetails($yajmanId)
+    public function getYajmanDetails($panditjiId,$yajmanId)
     {
-        $yajmanDetails = yajman::where('id', $yajmanId)->get();
+        $yajmanDetails = yajman::where('created_by',$panditjiId)
+        ->where('id', $yajmanId)
+        ->orderBy('created_at', 'asc') 
+        ->get();
         // dd($yajmanDetails);
         if (count($yajmanDetails) > 0) {
             $arr = [];
@@ -70,7 +73,9 @@ class yajman extends Model
     public function getYajmanUnderThePanditji($PanditId)
     {
         try {
-            $yajmansUnderPanditji = yajman::where('created_by', $PanditId)->get();
+            $yajmansUnderPanditji = yajman::where('created_by', $PanditId)
+            ->orderBy('created_at', 'asc') 
+            ->get();
             
             if (count($yajmansUnderPanditji) > 0) {
                 $arr = [];
@@ -98,7 +103,15 @@ class yajman extends Model
         }
 
     }
-    function city(){
-            return $this->belongsTo(city::class, 'city_id');
-        }
+        
+    public function IsYajman($panditjiId, $id){
+        $IsYajman = yajman::where('created_by', $panditjiId)->where('id', $id)->first();
+        return $IsYajman; 
+    
+    }
+    public function relation() {
+        return $this->hasMany(panditjiYajmanRelation::class);
+    }
+
+      
 }

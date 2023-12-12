@@ -301,6 +301,234 @@
                 }
             }
         },
+        "/api/v1/pandit/appointment/delete/{id}": {
+            "delete": {
+                "tags": [
+                    "Appointment"
+                ],
+                "summary": "delete appointment detail ",
+                "operationId": "deleteAppointmentById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Bearer Token",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": "200"
+                                        },
+                                        "Appointment deleted successfully": {}
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal Server Error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/pandit/appointment/updateAppointment/{id}": {
+            "put": {
+                "tags": [
+                    "Appointment"
+                ],
+                "summary": "Update the appointment for the yajman",
+                "operationId": "UpdateAppointment",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Bearer Token",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "yajmanId": {
+                                        "type": "string",
+                                        "example": "1"
+                                    },
+                                    "yajman_name": {
+                                        "type": "string",
+                                        "example": "Vedika"
+                                    },
+                                    "mobile_number": {
+                                        "type": "string",
+                                        "example": "7499670180"
+                                    },
+                                    "state": {
+                                        "type": "string",
+                                        "example": "21"
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "example": "328"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "Gandhi square,anjangaon bari"
+                                    },
+                                    "date": {
+                                        "type": "string",
+                                        "example": "20/10/2023"
+                                    },
+                                    "pooja": {
+                                        "type": "string",
+                                        "example": "Vidhi"
+                                    },
+                                    "other_pooja": {
+                                        "type": "string"
+                                    },
+                                    "pooja_material": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": "200"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Appointment updated Successfully"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": "403"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Appointmnet updation Failed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": "500"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal Server Error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/login/verify": {
             "post": {
                 "tags": [
@@ -728,13 +956,6 @@
                                             "experience": {
                                                 "type": "string"
                                             },
-                                            "poojas_can": {
-                                                "description": "Array of poojas IDs",
-                                                "type": "array",
-                                                "items": {
-                                                    "type": "integer"
-                                                }
-                                            },
                                             "otherlanguages": {
                                                 "type": "string"
                                             },
@@ -795,6 +1016,249 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Panfitji Registration Failed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": "500"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal Server Error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/pandit/profile": {
+            "get": {
+                "tags": [
+                    "Pandiji Registration"
+                ],
+                "summary": "Get panditji proile details",
+                "operationId": "getProfile",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Bearer Token",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": "200"
+                                        },
+                                        "panditji_profile_details": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal Server Error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Pandiji Registration"
+                ],
+                "summary": "Update profile details of panditji",
+                "operationId": "UpdateProfileDetails",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "personal_info": {
+                                        "properties": {
+                                            "title": {
+                                                "type": "string"
+                                            },
+                                            "other_title": {
+                                                "type": "string"
+                                            },
+                                            "first_name": {
+                                                "type": "string",
+                                                "example": "vedika"
+                                            },
+                                            "last_name": {
+                                                "type": "string",
+                                                "example": "jaware"
+                                            },
+                                            "state": {
+                                                "type": "string",
+                                                "example": "1"
+                                            },
+                                            "district": {
+                                                "type": "string",
+                                                "example": "2"
+                                            },
+                                            "address": {
+                                                "type": "string",
+                                                "example": "Mumbai"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "auth": {
+                                        "properties": {
+                                            "mobile_number": {
+                                                "type": "string",
+                                                "example": "7499670180"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "community_and_language": {
+                                        "properties": {
+                                            "community": {
+                                                "description": "Array of community IDs",
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "othercommunity": {
+                                                "type": "string"
+                                            },
+                                            "languages": {
+                                                "description": "Array of languages IDs",
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "otherlanguages": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "other_info": {
+                                        "properties": {
+                                            "working_time": {
+                                                "type": "string"
+                                            },
+                                            "experience": {
+                                                "type": "string"
+                                            },
+                                            "otherlanguages": {
+                                                "type": "string"
+                                            },
+                                            "working_in_temple": {
+                                                "type": "boolean"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": "200"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Panditji Updated successfully"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": "403"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Panfitji updatation Failed"
                                         }
                                     },
                                     "type": "object"
@@ -1492,6 +1956,209 @@
                 }
             }
         },
+        "/api/v1/pandit/poojaMaterial/deleteCreatedPuja/{id}": {
+            "delete": {
+                "tags": [
+                    "New Pooja"
+                ],
+                "summary": "delete appointment detail",
+                "operationId": "deletePuja",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Bearer Token",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": "200"
+                                        },
+                                        "Puja deleted successfully": {}
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal Server Error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/pandit/poojaMaterial/updatePuja/{id}": {
+            "put": {
+                "tags": [
+                    "New Pooja"
+                ],
+                "summary": "Update created pooja",
+                "operationId": "pujaUpdatation",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Bearer Token",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "pooja_name": {
+                                        "type": "string"
+                                    },
+                                    "pooja_material": {
+                                        "description": "Array of pooja material",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "created_by": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": "200"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Pooja updated successfully"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": "403"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Pooja updatation failed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": "500"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal Server Error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/pandit/yajman/create": {
             "post": {
                 "tags": [
@@ -1639,7 +2306,7 @@
                     "Yajman"
                 ],
                 "summary": "Get yajman registration details",
-                "operationId": "getYajmanRegistrationDetails",
+                "operationId": "getYajmanDetails",
                 "parameters": [
                     {
                         "name": "Authorization",
@@ -1704,7 +2371,7 @@
                     "Yajman"
                 ],
                 "summary": "Get yajman detail ",
-                "operationId": "getYajmanRegistrationDetails",
+                "operationId": "getYajmanDetailsById",
                 "parameters": [
                     {
                         "name": "id",
@@ -1758,6 +2425,228 @@
                                         "status": {
                                             "type": "boolean",
                                             "example": "false"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal Server Error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/pandit/deleteYajman/{id}": {
+            "delete": {
+                "tags": [
+                    "Yajman"
+                ],
+                "summary": "delete yajman detail ",
+                "operationId": "deleteYajmanById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Bearer Token",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": "200"
+                                        },
+                                        "Yajman deleted successfully": {}
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal Server Error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/pandit/updateYajman/{id}": {
+            "put": {
+                "tags": [
+                    "Yajman"
+                ],
+                "summary": "Update a yajman",
+                "operationId": "updateYajman",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Bearer Token",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "yajman_id": {
+                                        "type": "string",
+                                        "example": "1"
+                                    },
+                                    "yajman_name": {
+                                        "type": "string",
+                                        "example": "mahesh"
+                                    },
+                                    "mobile_number": {
+                                        "type": "string",
+                                        "example": "7499670180"
+                                    },
+                                    "state": {
+                                        "type": "string",
+                                        "example": "21"
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "example": "384"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "Gandhi square anjangaon bari"
+                                    },
+                                    "date_of_birth": {
+                                        "type": "string",
+                                        "example": "2010/05/30"
+                                    },
+                                    "created_by": {
+                                        "type": "string",
+                                        "example": "1"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": "200"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Yajman updated Successfully"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": "403"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Yajman updatation Failed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": "500"
                                         },
                                         "message": {
                                             "type": "string",

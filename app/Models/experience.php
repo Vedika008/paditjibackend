@@ -25,4 +25,19 @@ class experience extends Model
         }
         return false;
     }
+
+
+    public  function getSubjectiveNamesForValues($values)
+    {
+        $valuesArray = json_decode($values, true);
+              
+        $experienceDetails = experience::where('id', $valuesArray)->get();
+      
+
+        if (count($experienceDetails) > 0) {
+            return $experienceDetails;
+        }
+        return false;
+
+    }
 }

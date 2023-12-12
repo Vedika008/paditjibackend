@@ -60,6 +60,7 @@ class PanditjiRegistration extends Model implements JWTSubject
         }else{
             return false;
         }
+        
 
     }
     public function checkPanditjiExistByItsId($panditId){
@@ -70,6 +71,35 @@ class PanditjiRegistration extends Model implements JWTSubject
         }
 
         return false;
+    }
+   
+    public function getProfileDetails($id)
+    {
+        $panditjiRegistrationDetails = PanditjiRegistration::where('id', $id)
+        ->orderBy('created_at', 'asc')
+        ->get();
+        // dd(count($panditjiRegistrationDetails));
+        if (count($panditjiRegistrationDetails) > 0) {
+            $arr = [];
+            for ($i = 0; $i < count($panditjiRegistrationDetails); $i++) {
+                $element = $panditjiRegistrationDetails[$i];
+                $city = new city();
+                // dd($element);
+                $data = $city->getStateWithCityy($element['state'], $element['district']);
+                $element['state_id'] = $element['state'];
+                $element['city_id'] = $element['district'];
+
+                $element['state'] = $data['state'];
+                $element['district'] = $data['city'];
+             
+               array_push($arr, $element);
+            }
+            // dd($arr);
+            return $arr;
+        } else {
+            return false;
+        }
+
     }
 
 

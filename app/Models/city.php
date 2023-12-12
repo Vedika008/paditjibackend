@@ -36,12 +36,28 @@ class city extends Model
     public function getStateWithCity($stateId, $cityId)
     {
         try {
-            $city = city::where('city_id', $cityId)->first();
+            $city = city::where('city_id', $cityId)->orderBy('city_name', 'asc')->first();
+            // $stateList = State::orderBy('state_name', 'asc')->get();
+
             $state = null;
             if ($city) {
                 $state = state::where('state_id', $stateId)->first();
             }
             return ['state' => $state->state_name, 'city' => $city->city_name];
+        } catch (\Throwable $th) {
+            return false;
+        }
+    }
+
+    public function getStateWithCityy($stateId, $cityId)
+    {
+        try {
+            $city = city::where('city_id', $cityId)->orderBy('city_name', 'asc')->first();
+            $state = null;
+            if ($city) {
+                $state = state::where('state_id', $stateId)->first();
+            }
+            return ['state' => $state->state_name, 'city' => $city->city_name]; 
         } catch (\Throwable $th) {
             return false;
         }

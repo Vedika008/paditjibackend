@@ -25,4 +25,27 @@ class language extends Model
         }
         return false;
     }
+
+    public static function getSubjectiveNames()
+    {
+        $communities = self::all(['id', 'language_name'])->pluck('language_name', 'id')->toArray();
+
+        return $communities;
+    }
+
+    public  function getSubjectiveNamesForValues($values)
+    {
+        $valuesArray = json_decode($values, true);
+        $languageDetails= language::whereIn('id', $valuesArray)->get();
+        if(in_array('other', $valuesArray)){
+            $languageDetails = $languageDetails->toArray();
+            array_push($languageDetails, ['id'=> 'other', 'community_name'=> 'Other']);
+        }
+
+        if (count($languageDetails) > 0) {
+            return $languageDetails;
+        }
+        return false;
+
+    }
 }

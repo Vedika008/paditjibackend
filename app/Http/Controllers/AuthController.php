@@ -101,8 +101,6 @@ class AuthController extends Controller
                 // dd($expiration->timestamp);
 
                 $token = JWTAuth::fromUser($panditji, ['exp' => $expiration->timestamp]);
-
-
                 $panditji->community = json_decode($panditji->community);
                 $panditji->other_community = json_decode($panditji->other_community);
                 $panditji->language = json_decode($panditji->language);

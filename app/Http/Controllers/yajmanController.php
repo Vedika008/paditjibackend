@@ -93,7 +93,6 @@ class yajmanController extends Controller
      *       )
      *  )
      */
-    // panditji registration
 
     // yajman creation
     public function yajmanCreation(Request $request)
@@ -132,7 +131,7 @@ class yajmanController extends Controller
 
                         return response()->json(['status' => true, 'message' => 'Yajman register successfully', 'data' => $yajmansUnderPanditji], 200);
                     } else {
-                        return response()->json(['status' => false, 'error' => 'Something went wrong', 'message' => "Patient Registration Failed"], 500);
+                        return response()->json(['status' => false, 'error' => 'Something went wrong', 'message' => "Yajman Registration Failed"], 500);
                     }
                 }
             }
@@ -145,7 +144,7 @@ class yajmanController extends Controller
     // get yajman details
 
     /**
-     * Operation getYajmanRegistrationDetails
+     * Operation getYajmanDetails
      *
      *
      *
@@ -155,7 +154,7 @@ class yajmanController extends Controller
     /**
      * @OA\Get(
      *      path="/api/v1/pandit/getYajmans",
-     *      operationId="getYajmanRegistrationDetails",
+     *      operationId="getYajmanDetails",
      *      tags={"Yajman"},
      *      summary="Get yajman registration details",
      *  @OA\Parameter(
@@ -188,16 +187,16 @@ class yajmanController extends Controller
     {
         /* all yajmans under pandit*/
         try {
-        $panditjiId = $request->id;
-        $yajman = new yajman();
-        // $y =$yajman->find(1)->get();
-        //     dd($y);
-        $yajmanDetails = $yajman->getYajmanUnderThePanditji($panditjiId);
-        // dd($yajmanDetails);
-        if ($yajmanDetails) {
-            return response()->json(['status' => true, 'data' => $yajmanDetails], 200);
-        }
-        return response()->json(['status' => false, 'message' => 'Yajmans does not exist'], 400);
+            $panditjiId = $request->id;
+            $yajman = new yajman();
+            // $y =$yajman->find(1)->get();
+            //     dd($y);
+            $yajmanDetails = $yajman->getYajmanUnderThePanditji($panditjiId);
+            // dd($yajmanDetails);
+            if ($yajmanDetails) {
+                return response()->json(['status' => true, 'data' => $yajmanDetails], 200);
+            }
+            return response()->json(['status' => false, 'message' => 'Yajmans does not exist'], 200);
         } catch (\Throwable $th) {
             // dd($th);
             return response()->json(['status' => false, 'message' => 'Internal server error', 'error' => $th], 500);
@@ -205,11 +204,18 @@ class yajmanController extends Controller
     }
 
     // get yajman details by id
+    /**
+     * Operation getYajmanDetailsById
+     *
+     *
+     *
+     * @return Http response
+     */
 
-/**
+    /**
      * @OA\Get(
      *      path="/api/v1/pandit/view/{id}",
-     *      operationId="getYajmanRegistrationDetails",
+     *      operationId="getYajmanDetailsById",
      *      tags={"Yajman"},
      *      summary="Get yajman detail ",
      *       @OA\Parameter(
@@ -252,7 +258,7 @@ class yajmanController extends Controller
         try {
             $panditjiId = $request->id;
             $yajman = new yajman();
-            $yajmanDetails = $yajman->getYajmanDetails($id);
+            $yajmanDetails = $yajman->getYajmanDetails($panditjiId, $id);
             // dd($yajmanDetails);
             if ($yajmanDetails) {
                 return response()->json(['status' => true, 'message' => 'Yajman details retrived successfully', 'data' => $yajmanDetails[0]], 200);
@@ -262,4 +268,177 @@ class yajmanController extends Controller
             return response()->json(['status' => false, 'message' => 'Internal server error', 'error' => $th], 500);
         }
     }
+
+   /**
+     * Operation deleteYajmanById
+     *
+     *
+     *
+     * @return Http response
+     */
+
+    /**
+     * @OA\Delete(
+     *      path="/api/v1/pandit/deleteYajman/{id}",
+     *      operationId="deleteYajmanById",
+     *      tags={"Yajman"},
+     *      summary="delete yajman detail ",
+     *       @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          required=true,
+     *          description="id",
+     *          @OA\Schema(type="string")
+     *      ),
+     *   @OA\Parameter(
+     *          name="Authorization",
+     *          in="header",
+     *          required=true,
+     *          description="Bearer Token",
+     *          @OA\Schema(type="string")
+     *      ),
+     *     @OA\Response(
+     *          response=200, description="Success",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="true"),
+     *             @OA\Property(property="code",type="integer", example="200"),
+     *             @OA\Property(property="Yajman deleted successfully")
+     *          )
+     *       ),
+     *     @OA\Response(
+     *          response=500, description="Internal Server Error",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="false"),
+     *             @OA\Property(property="message", type="string", example="Internal Server Error")
+     *          )
+     *       )
+     *  )
+     */
+
+
+    public function deleteYajman(Request $request, $id)
+    {
+        try {
+
+            $panditjiId = $request->id;
+            $apt = new yajman();
+            $YajmanExistOrNot = $apt->IsYajman($panditjiId, $id);
+
+
+            if (!$YajmanExistOrNot) {
+                return response()->json(['status' => false, 'message' => 'Resource not found'], 200);
+            }
+
+            $YajmanExistOrNot->relation()->delete();
+            $YajmanExistOrNot->delete();
+
+            return response()->json(['status' => true, 'message' => 'Resource deleted successfully'], 200);
+        } catch (\Throwable $th) {
+            dd($th);
+            return response()->json(['status' => false, 'message' => 'Internal server error'], 500);
+        }
+    }
+      /**
+     * Operation updateYajman
+     *
+     *
+     * @return Http response
+     */
+
+    /**
+     * @OA\Put(
+     *      path="/api/v1/pandit/updateYajman/{id}",
+     *      operationId="updateYajman",
+     *      tags={"Yajman"},
+     *      summary="Update a yajman",
+     *      @OA\Parameter(
+     *          name="Authorization",
+     *          in="header",
+     *          required=true,
+     *          description="Bearer Token",
+     *          @OA\Schema(type="string")
+     *      ),
+     *      @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          required=true,
+     *          description="id",
+     *          @OA\Schema(type="string")
+     *      ),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *                     @OA\Property(property="yajman_id", type="string", example="1"),
+     *                      @OA\Property(property="yajman_name", type="string", example="mahesh"),
+     *                      @OA\Property(property="mobile_number",type="string" ,example= "7499670180"), 
+     *                      @OA\Property(property="state", type="string" ,example ="21"),
+     *                      @OA\Property(property="city", type="string",example ="384"),
+     *                      @OA\Property(property="address", type="string",example="Gandhi square anjangaon bari"),
+     *                      @OA\Property(property="date_of_birth", type="string" ,example ="2010/05/30"),
+     *                      @OA\Property(property="created_by", type="string",example="1")
+     *        ),
+     *     ),
+     *     @OA\Response(
+     *          response=200, description="Success",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="true"),
+     *             @OA\Property(property="code",type="integer", example="200"),
+     *             @OA\Property(property="message",type="string", example="Yajman updated Successfully"),
+     *             @OA\Property(property="data",type="object")
+     *          )
+     *       ),
+     *    @OA\Response(
+     *          response=403, description="Internal Server Error",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="false"),
+     *             @OA\Property(property="code",type="integer", example="403"),
+     *             @OA\Property(property="message", type="string", example="Yajman updatation Failed")
+     *          )
+     *       ),
+     *     @OA\Response(
+     *          response=500, description="Internal Server Error",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="false"),
+     *             @OA\Property(property="code",type="integer", example="500"),
+     *             @OA\Property(property="message", type="string", example="Internal Server Error")
+     *          )
+     *       )
+     *  )
+     */ 
+
+     public function updateYajmanDetails(Request $request,$id){
+        try {
+            $input = $request ->all();
+            $panditjiId = $request->id;
+            $yajman = new yajman();
+            $YajmanExistOrNot = $yajman->IsYajman($panditjiId, $id);
+
+            if(!$YajmanExistOrNot){
+                return response()->json(['status' =>false , 'message' => 'yajman does not exist'],200);
+            }else{
+                $yajman->yajman_name = $input['yajman_name'];
+                $yajman->mobile_number = $input['mobile_number'];
+                $yajman->state = $input['state'];
+                $yajman->city = $input['city'];
+                $yajman->address = $input['address'];
+                $yajman->date_of_birth = null;
+                $yajman->created_by = $panditjiId;
+                $save = $yajman->save();
+                if ($save) {
+                    return response()->json(['status' => true, 'message' => 'Yajman updated successfully', 'data' =>$YajmanExistOrNot], 200);
+                } else {
+                    return response()->json(['status' => false, 'error' => 'Something went wrong', 'message' => "Yajman updatation Failed"], 500);
+                }
+            }
+            
+        } catch (\Throwable $th) {
+            return response()->json(['status' => false,"message" => 'Internal server error'], 200);
+
+        }
+     }
 }

@@ -19,8 +19,8 @@ class state extends Model
 
     public function getStateList()
     {
-        $stateList = state :: all();
-          if (count($stateList) > 0) {
+        $stateList = State::orderBy('state_name', 'asc')->get();
+        if (count($stateList) > 0) {
             return $stateList;
         }
         return false;

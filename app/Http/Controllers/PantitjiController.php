@@ -7,9 +7,11 @@ use App\Models\city;
 use App\Models\Community;
 use App\Models\experience;
 use App\Models\language;
+use App\Models\newPooja;
 use App\Models\PanditjiRegistration;
 use App\Models\PoojasThatPerformed;
 use App\Models\state;
+use App\Models\title;
 use App\Models\working_hr;
 use App\Models\yajman;
 use Illuminate\Http\Request;
@@ -56,7 +58,6 @@ class PantitjiController extends Controller
      *            @OA\Property(property="other_info", type="object",   
      *                      @OA\Property(property="working_time", type="string"),
      *                      @OA\Property(property="experience", type="string"),
-     *                      @OA\Property(property="poojas_can",type="array",  @OA\Items(type="integer"), description="Array of poojas IDs"),
      *                      @OA\Property(property="otherlanguages", type="string"),
      *                      @OA\Property(property="working_in_temple", type="boolean"),
      *             ),
@@ -124,8 +125,8 @@ class PantitjiController extends Controller
 
                 $pr->working_hr = $otherInfo['working_time'];
                 $pr->experience = $otherInfo['experience'];
-                $pr->otherPooja = json_encode($otherInfo['other_pooja']);
-                $pr->poojasPerformed = json_encode($otherInfo['poojas_can']);
+                // $pr->otherPooja = json_encode($otherInfo['other_pooja']);
+                // $pr->poojasPerformed = json_encode($otherInfo['poojas_can']);
                 $pr->working_in_temple = $otherInfo['working_in_temple'];
                 // $string=implode(' ',$pr);
                 // dd($string);
@@ -133,7 +134,7 @@ class PantitjiController extends Controller
                 $save = $pr->save();
 
                 if ($save) {
-                    return response()->json(['status' => true, 'message' => "Pandit registered successfully"], 200);
+                    return response()->json(['status' => true, 'message' => "Pandit registration successful"], 200);
                 } else {
                     return response()->json(['status' => false, 'error' => 'Something went wrong', 'message' => "Panditji Registration Failed"], 200);
                 }
@@ -146,20 +147,96 @@ class PantitjiController extends Controller
         }
     }
 
+
+      /**
+     * Operation getProfile
+     *
+     *
+     *
+     * @return Http response
+     */
+
+    /**
+     * @OA\Get(
+     *      path="/api/v1/pandit/profile",
+     *      operationId="getProfile",
+     *      tags={"Pandiji Registration"},
+     *      summary="Get panditji proile details",
+    *      @OA\Parameter(
+     *          name="Authorization",
+     *          in="header",
+     *          required=true,
+     *          description="Bearer Token",
+     *          @OA\Schema(type="string")
+     *      ),
+     *     @OA\Response(
+     *          response=200, description="Success",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="true"),
+     *             @OA\Property(property="code",type="integer", example="200"),
+     *             @OA\Property(property="panditji_profile_details",type="object")
+     *          )
+     *       ),
+     *     @OA\Response(
+     *          response=500, description="Internal Server Error",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="false"),
+     *             @OA\Property(property="message", type="string", example="Internal Server Error")
+     *          )
+     *       )
+     *  )
+     */
+
     public function getProfile(Request $request)
     {
         try {
-            // dd(isset($request->id), $request->id);
             if (isset($request->id)) {
                 $pandit = PanditjiRegistration::where('id', $request->id)->first();
-                $pandit->community = json_decode($pandit->community);
-                $pandit->other_community = json_decode($pandit->other_community);
-                $pandit->language = json_decode($pandit->language);
-                $pandit->other_language = json_decode($pandit->other_language);
-                $pandit->poojasPerformed = json_decode($pandit->poojasPerformed);
-                $pandit->otherPooja = json_decode($pandit->otherPooja);
-                // dd($pandit->toArray());
-                return response()->json(['status' => true, 'data' => $pandit], 200);
+
+                $panditji = new PanditjiRegistration();
+
+                $dataa = $panditji->getProfileDetails($request->id);
+
+                $com = new Community();
+                $communityData = $com->getSubjectiveNamesForValues($dataa[0]->community);
+
+                $createdPooja= newPooja::select('pooja_name')->where('created_by',$request->id)->get();
+
+                // dd('other community',$dataa[0]->other_community);
+                
+                $lang = new language();
+                $languageData = $lang->getSubjectiveNamesForValues($dataa[0]->language); 
+
+                
+                $poojaPerformed = new newPooja();
+                $poojaperformedData = $poojaPerformed->getSubjectiveNamesForValues($dataa[0]->poojasPerformed); 
+    
+                $working_hr = new working_hr();
+                $workingHrData = $working_hr->getSubjectiveNamesForValues($dataa[0]->working_hr);
+    
+                
+                $exp = new experience();
+                $experienceData = $exp->getSubjectiveNamesForValues($dataa[0]->experience);
+
+                $title = new title();
+                $titleData = $title->getSubjectiveNamesForValues($dataa[0]->title);
+
+                $dataa[0]->title = $titleData;
+                $dataa[0]->other_title = $dataa[0]['other_title'];
+                $dataa[0]->community = $communityData;
+                $dataa[0]->other_community = json_decode( $dataa[0]['other_community']);
+                $dataa[0]->language = $languageData ;
+                $dataa[0]->other_language =$dataa[0]['other_language'] ;
+                $dataa[0]->poojasPerformed = $createdPooja;
+                $dataa[0] ->working_hr = $workingHrData;
+                $dataa[0] ->experience = $experienceData;
+    
+    
+                $dataa[0]->otherPooja = json_decode($dataa[0]->otherPooja);
+
+                return response()->json(['status' => true, 'data' => $dataa[0]], 200);
             }
         } catch (\Throwable $th) {
             dd($th);
@@ -167,7 +244,164 @@ class PantitjiController extends Controller
         }
     }
 
+    
+    /**
+     * Operation UpdateProfileDetails
+     *
+     *
+     * @return Http response
+     */
 
+    /**
+     * @OA\Put(
+     *      path="/api/v1/pandit/profile",
+     *      operationId="UpdateProfileDetails",
+     *      tags={"Pandiji Registration"},
+     *      summary="Update profile details of panditji",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              @OA\Property(property="personal_info", type="object",   
+     *                      @OA\Property(property="title", type="string"),
+     *                      @OA\Property(property="other_title",type="string"), 
+     *                      @OA\Property(property="first_name", type="string" ,example ="vedika"),
+     *                      @OA\Property(property="last_name", type="string",example ="jaware"),
+     *                      @OA\Property(property="state", type="string",example="1"),
+     *                      @OA\Property(property="district", type="string" ,example ="2"),
+     *                      @OA\Property(property="address", type="string", example ="Mumbai")
+     *                 ),
+     *            @OA\Property(property="auth", type="object",   
+     *                      @OA\Property(property="mobile_number", type="string" , example="7499670180"),
+     *                 ),
+     *            @OA\Property(property="community_and_language", type="object", 
+     *                      @OA\Property(property="community",type="array",  @OA\Items(type="integer"), description="Array of community IDs"),
+     *                      @OA\Property(property="othercommunity", type="string"),
+     *                      @OA\Property(property="languages",type="array",  @OA\Items(type="integer"), description="Array of languages IDs"),
+     *                      @OA\Property(property="otherlanguages", type="string")
+     *             ),
+     *            @OA\Property(property="other_info", type="object",   
+     *                      @OA\Property(property="working_time", type="string"),
+     *                      @OA\Property(property="experience", type="string"),
+     *                      @OA\Property(property="otherlanguages", type="string"),
+     *                      @OA\Property(property="working_in_temple", type="boolean"),
+     *             ),
+     *        ),
+     *     ),
+     *     @OA\Response(
+     *          response=200, description="Success",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="true"),
+     *             @OA\Property(property="code",type="integer", example="200"),
+     *             @OA\Property(property="message",type="string", example="Panditji Updated successfully"),
+     *             @OA\Property(property="data",type="object")
+     *          )
+     *       ),
+     *    @OA\Response(
+     *          response=403, description="Internal Server Error",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="false"),
+     *             @OA\Property(property="code",type="integer", example="403"),
+     *             @OA\Property(property="message", type="string", example="Panfitji updatation Failed")
+     *          )
+     *       ),
+     *     @OA\Response(
+     *          response=500, description="Internal Server Error",
+     *          @OA\Schema(type="application/pdf"),
+     *          @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example="false"),
+     *             @OA\Property(property="code",type="integer", example="500"),
+     *             @OA\Property(property="message", type="string", example="Internal Server Error")
+     *          )
+     *       )
+     *  )
+     */
+   public function updateProfile(Request $request)
+    {
+        try {
+            $panditjiId =$request->id;
+            $panditji = PanditjiRegistration::find($panditjiId);
+    
+            if (!$panditji) {
+                return response()->json(['status' => false, 'message' => 'Panditji not found'], 404);
+            }
+           
+    
+            $panditji->title = $request->input('personal_info.title');
+            $panditji->first_name = $request->input('personal_info.first_name');
+            $panditji->last_name = $request->input('personal_info.last_name');
+            $panditji->state = $request->input('personal_info.state');
+            $panditji->district = $request->input('personal_info.district');
+            $panditji->address = $request->input('personal_info.address');
+            $panditji->other_title = $request -> input('personal_info.other_title');
+
+            // $panditji->mobile_number = $request->input('auth.mobile_number');
+            //  dd($request->input('community_and_language')['othercommunity']);
+            
+            $panditji->community = $request->input('community_and_language.community');
+            $panditji->other_community = $request->input('community_and_language')['othercommunity'];
+            $panditji->language = $request->input('community_and_language.languages');
+            $panditji->other_language  = $request->input('community_and_language')['otherlanguages'];
+
+            
+            $panditji->working_hr = $request->input('other_info.working_time');
+            $panditji->experience = $request->input('other_info.experience');
+            $panditji->working_in_temple = $request->input('other_info.working_in_temple');
+
+            $save = $panditji->save();
+
+            $dataa = $panditji->getProfileDetails($request->id);
+
+            $com = new Community();
+            $communityData = $com->getSubjectiveNamesForValues($dataa[0]->community);
+
+            
+            $lang = new language();
+            $languageData = $lang->getSubjectiveNamesForValues($dataa[0]->language); 
+
+            $poojaPerformed = new newPooja();
+            $poojaperformedData = $poojaPerformed->getSubjectiveNamesForValues($dataa[0]->poojasPerformed); 
+
+            $working_hr = new working_hr();
+            $workingHrData = $working_hr->getSubjectiveNamesForValues($dataa[0]->working_hr);
+
+            
+            $exp = new experience();
+            $experienceData = $exp->getSubjectiveNamesForValues($dataa[0]->experience);
+
+            $title = new title();
+            $titleData = $title->getSubjectiveNamesForValues($dataa[0]->title);
+
+            $dataa[0]->title = $titleData;
+            $dataa[0]->other_title = $dataa[0]['other_title'];
+
+
+            $dataa[0]->title = $titleData;
+            $dataa[0]->community = $communityData;
+            $dataa[0]->other_community = json_decode($dataa[0]->other_community);
+            $dataa[0]->language = $languageData ;
+            $dataa[0]->other_language = json_decode($dataa[0]->other_language);
+            $dataa[0]->poojasPerformed = $poojaperformedData;
+            $dataa[0] ->working_hr = $workingHrData;
+            $dataa[0] ->experience = $experienceData;
+
+
+
+            $dataa[0]->otherPooja = json_decode($dataa[0]->otherPooja);
+
+            if ($save) {
+                return response()->json(['status' => true, 'message' => 'Profile updated successfully', 'data' => $dataa], 200);
+            } else {
+                return response()->json(['status' => false, 'error' => 'Something went wrong', 'message' => "Panditji updation Failed"], 200);
+            }       
+        } catch (\Throwable $th) {
+            dd($th);
+            return response()->json(['status' => false, 'message' => 'Internal Server Error'], 500);
+        }
+    }
+    
+    
     /**
      * Operation getPanditjiRegistrationDetails
      *
@@ -254,6 +488,9 @@ class PantitjiController extends Controller
                 return response()->json(['status' => true, 'message' => 'Panditji data successfully retrived', 'data' => $structuredData], 200);
             }
         } catch (\Throwable $th) {
+
+
+    
             return response()->json(['status' => false, 'message' => 'Internal server error'], 500);
         }
     }
@@ -321,8 +558,11 @@ class PantitjiController extends Controller
             $panditjiExperience = new experience();
             $experienceList = $panditjiExperience->getExperienceList();
 
+            $title = new title();
+            $titlelist = $title -> gettitleList();
+
             if ($PoojaList) {
-                return response()->json(['status' => true, 'message' => 'Data retrived successfully', 'data' => ['community' => $CommunityList, 'language' => $languageList, 'state' => $stateList, 'workingHrList' => $workingHrList, 'experienceList' => $experienceList]], 200);
+                return response()->json(['status' => true, 'message' => 'Data retrived successfully', 'data' => ['community' => $CommunityList, 'language' => $languageList, 'state' => $stateList, 'workingHrList' => $workingHrList, 'experienceList' => $experienceList,'titleList' => $titlelist] ], 200);
             }
             return response()->json(['status' => false, 'message' => 'something went wrong'], 500);
         } catch (\Throwable $th) {

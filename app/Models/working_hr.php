@@ -25,4 +25,16 @@ class working_hr extends Model
         }
         return false;
     }
+    
+    public function getSubjectiveNamesForValues($values){
+         $valuesArray = json_decode($values, true);
+
+            $PoojaDetails = working_hr ::  select('id', 'working_hr')->where('id',$values)
+            ->get();
+            if (count($PoojaDetails) > 0) {
+                return $PoojaDetails;
+            }
+            return false;
+       
+    }
 }

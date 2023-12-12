@@ -51,9 +51,16 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
 $router->group(['prefix' => 'api/v1/pandit/', 'middleware' => 'auth'], function () use ($router) {
     /* yajaman apis  */
     $router->get('profile', 'PantitjiController@getProfile');
+    $router->put('profile', 'PantitjiController@updateProfile');
+
+
     $router->post('yajman/create', 'yajmanController@yajmanCreation');
     $router->get('getYajmans', 'yajmanController@getYajmanDetails');
     $router->get('getYajman/{id}', 'yajmanController@getYajmanDetailsByYajmanId');
+    $router->delete('deleteYajman/{id}', 'yajmanController@deleteYajman');
+    $router->put('updateYajman/{id}', 'yajmanController@updateYajmanDetails');
+
+
 });
 
 $router->group(['prefix' => 'api/v1/pandit/poojaMaterial/', 'middleware' => 'auth'], function () use ($router) {
@@ -62,9 +69,10 @@ $router->group(['prefix' => 'api/v1/pandit/poojaMaterial/', 'middleware' => 'aut
     $router->get('view', 'PujaController@getAllPujaThatCreated');
     $router->get('view/{id}', 'PujaController@getPujaById');
     $router->put('update/{id}', 'PujaController@updatePooja');
-    // $router->delete('dalete/{id}', 'PujaController@addPuja');
-
+    $router->delete('deleteCreatedPuja/{id}', 'PujaController@deletePuja');
     $router->get('getPujaMaterial', 'PujaController@getAllPoojaMaterials');
+    $router->put('updatePuja/{id}', 'PujaController@updatePujaDetails');
+
 });
 
 $router->group(['prefix' => 'api/v1/pandit/appointment', 'middleware' => 'auth'], function () use ($router) {
@@ -72,4 +80,8 @@ $router->group(['prefix' => 'api/v1/pandit/appointment', 'middleware' => 'auth']
     $router->post('create', 'AppointmentController@createAppointment');
     $router->get('view', 'AppointmentController@getAppointmentDetails');
     $router->get('view/{id}', 'AppointmentController@getAppointmentById');
+    $router->delete('delete/{id}', 'AppointmentController@deleteAppointment');
+    $router->put('updateAppointment/{id}', 'AppointmentController@updateAppointment');
+
+
 });
